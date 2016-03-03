@@ -1,0 +1,17 @@
+package se.hirt.pi.adafruit.pwm;
+
+import se.hirt.pi.adafruit.pwm.PWMDevice;
+
+public class DcMotor {
+	
+	private static int[][] pins = {{8,9,10},{13,12,11},{2,3,4},{7,6,5}};
+	
+	private int pwmPin, in1, in2;
+	
+	public DcMotor(Controller c, int port) {
+		if (port < 0 || port > 1)
+		pwmPin = pins[port][0];
+		in2 = pins[port][1];
+		in1 = pins[port][2];
+	}
+}
