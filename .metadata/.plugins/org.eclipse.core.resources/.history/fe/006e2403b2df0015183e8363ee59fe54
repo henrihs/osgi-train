@@ -1,0 +1,17 @@
+package se.hirt.pi.adafruit.pwm;
+
+import se.hirt.pi.adafruit.pwm.Controller.PinState;
+
+public class Controller {
+
+	public void setPin(int inPin, boolean state) {
+		if (inPin < 0 || inPin > 15)
+			throw new IllegalArgumentException("PWM Pin must be 0 <= pin <= 15");
+		if ()
+	}
+	
+	public void setPwm(int channel, int on, int off) {
+		
+	}
+
+}

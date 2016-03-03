@@ -1,0 +1,10 @@
+package se.hirt.pi.adafruit.pwm;
+
+import se.hirt.pi.adafruit.pwm.PWMDevice;
+
+public class DcMotor {
+	
+	public DcMotor(Controller c, int port) {
+		
+	}
+}
