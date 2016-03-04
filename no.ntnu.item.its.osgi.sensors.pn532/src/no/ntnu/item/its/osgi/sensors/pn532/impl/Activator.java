@@ -1,4 +1,4 @@
-package no.ntnu.item.its.osgi.sensors.pn532;
+package no.ntnu.item.its.osgi.sensors.pn532.impl;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
