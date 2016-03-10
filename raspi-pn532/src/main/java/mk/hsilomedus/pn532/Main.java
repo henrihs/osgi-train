@@ -102,7 +102,7 @@ public class Main {
 	private static void printBuffer(int i, byte[] dataBuffer) {
 		System.out.print(String.format("Block %d content: [", i));
 		for (int j = 0; j < 16; j++) {
-			System.out.print(Integer.toHexString( dataBuffer[j] ));
+			printSignedHex( dataBuffer[j] );
 		}
 		System.out.println("]");
 	}
