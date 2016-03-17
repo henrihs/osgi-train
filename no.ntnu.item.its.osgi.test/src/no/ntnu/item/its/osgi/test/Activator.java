@@ -35,7 +35,7 @@ public class Activator implements BundleActivator {
 	 */
 	public void start(BundleContext bundleContext) throws Exception {
 		Activator.context = bundleContext;
-		Filter filter = FrameworkUtil.createFilter("(service.scope=singleton)");
+		Filter filter = FrameworkUtil.createFilter("(service.scope=bundle)");
 		Object[] loggerRef = context.getServiceReferences(LogService.class, filter.toString()).toArray();
 		if (loggerRef.length > 0 && loggerRef[0] != null ) {
 			LogService logger = (context.getService((ServiceReference<LogService>) loggerRef[0]));
