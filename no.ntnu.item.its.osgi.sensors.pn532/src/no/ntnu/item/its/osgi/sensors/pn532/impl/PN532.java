@@ -1,5 +1,6 @@
 package no.ntnu.item.its.osgi.sensors.pn532.impl;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 import no.ntnu.item.its.osgi.sensors.common.enums.Status;
@@ -38,12 +39,12 @@ public class PN532 implements IPN532 {
 		return null;
 	}
 
-	public void begin() {
+	public void begin() throws IOException {
 		medium.begin();
 		medium.wakeup();
 	}
 
-	public long getFirmwareVersion() throws InterruptedException {
+	public long getFirmwareVersion() throws InterruptedException, IOException {
 		long response;
 
 		byte[] command = new byte[1];
@@ -72,7 +73,7 @@ public class PN532 implements IPN532 {
 		return response;
 	}
 
-	public boolean SAMConfig() throws InterruptedException {
+	public boolean SAMConfig() throws InterruptedException, IOException {
 		byte[] command = new byte[2];
 		command[0] = PN532_COMMAND_SAMCONFIGURATION;
 		command[1] = 0x01; // normal mode;
@@ -90,7 +91,7 @@ public class PN532 implements IPN532 {
 	 * @see no.ntnu.item.its.osgi.sensors.pn532.impl.IPN532#writeMifareBlock(int, byte[])
 	 */
 	@Override
-	public boolean writeMifareBlock(int blockNumber, byte[] content) throws InterruptedException {
+	public boolean writeMifareBlock(int blockNumber, byte[] content) throws InterruptedException, IOException {
 		if (content.length != 16)
 			return false;
 		Arrays.fill(pn532_packetbuffer, (byte) 0xFF);
@@ -118,7 +119,7 @@ public class PN532 implements IPN532 {
 	 * @see no.ntnu.item.its.osgi.sensors.pn532.impl.IPN532#readMifareBlock(int, byte[])
 	 */
 	@Override
-	public boolean readMifareBlock(int blockNumber, byte[] buffer) throws InterruptedException {
+	public boolean readMifareBlock(int blockNumber, byte[] buffer) throws InterruptedException, IOException {
 		Arrays.fill(pn532_packetbuffer, (byte) 0xFF);
 		byte[] command = new byte[4];
 		command[0] = PN532_COMMAND_INDATAEXCHANGE;
@@ -152,7 +153,7 @@ public class PN532 implements IPN532 {
 	 * @see no.ntnu.item.its.osgi.sensors.pn532.impl.IPN532#authenticateMifareBlock(byte, no.ntnu.item.its.osgi.sensors.pn532.IPN532.MifareKeyType, byte[], byte[])
 	 */
 	@Override
-	public boolean authenticateMifareBlock(byte block, MifareKeyType keyType, byte[] key, byte[] uid) throws InterruptedException {
+	public boolean authenticateMifareBlock(byte block, MifareKeyType keyType, byte[] key, byte[] uid) throws InterruptedException, IOException {
 		Arrays.fill(pn532_packetbuffer, (byte) 0xFF);
 		byte[] command = new byte[14];
 		command[0] = PN532_COMMAND_INDATAEXCHANGE;
@@ -185,7 +186,7 @@ public class PN532 implements IPN532 {
 	 * @see no.ntnu.item.its.osgi.sensors.pn532.impl.IPN532#readPassiveTargetID(byte, byte[])
 	 */
 	@Override
-	public int readPassiveTargetID(byte cardbaudrate, byte[] buffer) throws InterruptedException {
+	public int readPassiveTargetID(byte cardbaudrate, byte[] buffer) throws InterruptedException, IOException {
 		byte[] command = new byte[3];
 		command[0] = PN532_COMMAND_INLISTPASSIVETARGET;
 		command[1] = 1; // max 1 cards at once (we can set this to 2 later)

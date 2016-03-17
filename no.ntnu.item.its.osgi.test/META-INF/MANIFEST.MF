@@ -9,5 +9,4 @@ Import-Package: no.ntnu.item.its.osgi.sensors.common.exceptions,
  no.ntnu.item.its.osgi.sensors.pn532,
  org.osgi.framework;version="1.3.0",
  org.osgi.service.log;version="1.3.0"
-Bundle-ActivationPolicy: lazy
-Export-Package: no.ntnu.item.its.osgi.test;uses:="org.osgi.framework,org.osgi.service.log"
+Export-Package: no.ntnu.item.its.osgi.test;uses:="org.osgi.framework,org.osgi.service.log,no.ntnu.item.its.osgi.sensors.pn532"

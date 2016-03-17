@@ -1,5 +1,7 @@
 package no.ntnu.item.its.osgi.sensors.pn532.impl;
 
+import java.io.IOException;
+
 public interface IPN532Interface {
   
   static final byte PN532_PREAMBLE = 0x00;
@@ -10,14 +12,14 @@ public interface IPN532Interface {
   static final byte PN532_HOSTTOPN532 = (byte) 0xD4;
   static final byte PN532_PN532TOHOST = (byte) 0xD5;
 
-	public abstract void begin();
+  public void begin() throws IOException;
 
 	public abstract void wakeup();
 
 	public abstract CommandStatus writeCommand(byte[] header, byte[] body)
-			throws InterruptedException;
+			throws InterruptedException, IOException;
 
-	public abstract CommandStatus writeCommand(byte header[]) throws InterruptedException;
+	public abstract CommandStatus writeCommand(byte header[]) throws InterruptedException, IOException;
 
 	public abstract int readResponse(byte[] buffer, int expectedLength,
 			int timeout) throws InterruptedException;

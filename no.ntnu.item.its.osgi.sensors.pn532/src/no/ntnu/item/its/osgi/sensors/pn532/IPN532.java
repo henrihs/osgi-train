@@ -1,5 +1,7 @@
 package no.ntnu.item.its.osgi.sensors.pn532;
 
+import java.io.IOException;
+
 import no.ntnu.item.its.osgi.sensors.common.interfaces.SensorHardware;
 
 /*
@@ -23,7 +25,7 @@ public interface IPN532 extends SensorHardware {
 	 * @return true if the authentication was successful
 	 */
 	boolean authenticateMifareBlock(byte block, MifareKeyType keyType, byte[] key, byte[] uid)
-			throws InterruptedException;
+			throws InterruptedException, IOException;
 	
 	/*
 	 * Write to a MiFare block
@@ -33,7 +35,7 @@ public interface IPN532 extends SensorHardware {
 	 * 
 	 * @return true if the write was successful
 	 */
-	boolean writeMifareBlock(int blockNumber, byte[] content) throws InterruptedException;
+	boolean writeMifareBlock(int blockNumber, byte[] content) throws InterruptedException, IOException;
 
 	
 	/*
@@ -44,7 +46,7 @@ public interface IPN532 extends SensorHardware {
 	 * 
 	 * @return true if the read was successful
 	 */
-	boolean readMifareBlock(int blockNumber, byte[] buffer) throws InterruptedException;
+	boolean readMifareBlock(int blockNumber, byte[] buffer) throws InterruptedException, IOException;
 
 
 	/*
@@ -56,5 +58,5 @@ public interface IPN532 extends SensorHardware {
 	 * @return length of response
 	 * 
 	 */
-	int readPassiveTargetID(byte cardbaudrate, byte[] buffer) throws InterruptedException;
+	int readPassiveTargetID(byte cardbaudrate, byte[] buffer) throws InterruptedException, IOException;
 }
