@@ -1,10 +1,10 @@
-package no.ntnu.item.its.osgi.sensors.pn532.impl;
+package no.ntnu.item.its.osgi.sensors.mifare.pn532;
 
 import java.io.IOException;
 import java.util.Arrays;
 
 import no.ntnu.item.its.osgi.sensors.common.enums.Status;
-import no.ntnu.item.its.osgi.sensors.pn532.IPN532;
+import no.ntnu.item.its.osgi.sensors.mifare.IPN532;
 
 public class PN532 implements IPN532 {
 

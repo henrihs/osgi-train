@@ -1,10 +1,10 @@
-package no.ntnu.item.its.osgi.sensors.pn532;
+package no.ntnu.item.its.osgi.sensors.mifare;
 
 import java.io.IOException;
 
 import no.ntnu.item.its.osgi.sensors.common.exceptions.SensorInitializationException;
-import no.ntnu.item.its.osgi.sensors.pn532.impl.PN532;
-import no.ntnu.item.its.osgi.sensors.pn532.impl.PN532I2C;
+import no.ntnu.item.its.osgi.sensors.mifare.pn532.PN532;
+import no.ntnu.item.its.osgi.sensors.mifare.pn532.PN532I2C;
 
 public class PN532Factory {
 	

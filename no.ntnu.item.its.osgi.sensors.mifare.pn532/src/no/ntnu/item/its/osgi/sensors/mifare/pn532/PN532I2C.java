@@ -1,5 +1,5 @@
 
-package no.ntnu.item.its.osgi.sensors.pn532.impl;
+package no.ntnu.item.its.osgi.sensors.mifare.pn532;
 
 import java.io.IOException;
 import java.util.ArrayList;

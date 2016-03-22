@@ -7,9 +7,9 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
 import no.ntnu.item.its.osgi.sensors.common.exceptions.SensorInitializationException;
-import no.ntnu.item.its.osgi.sensors.pn532.IPN532;
-import no.ntnu.item.its.osgi.sensors.pn532.IPN532.MifareKeyType;
-import no.ntnu.item.its.osgi.sensors.pn532.PN532Factory;
+import no.ntnu.item.its.osgi.sensors.mifare.IPN532;
+import no.ntnu.item.its.osgi.sensors.mifare.PN532Factory;
+import no.ntnu.item.its.osgi.sensors.mifare.IPN532.MifareKeyType;
 
 public class Activator implements BundleActivator {
 

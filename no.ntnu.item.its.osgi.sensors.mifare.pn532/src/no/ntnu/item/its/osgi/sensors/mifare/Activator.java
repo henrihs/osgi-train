@@ -1,4 +1,4 @@
-package no.ntnu.item.its.osgi.sensors.pn532;
+package no.ntnu.item.its.osgi.sensors.mifare;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -9,7 +9,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogService;
 
 import no.ntnu.item.its.osgi.sensors.common.exceptions.SensorInitializationException;
-import no.ntnu.item.its.osgi.sensors.pn532.IPN532.MifareKeyType;
+import no.ntnu.item.its.osgi.sensors.mifare.IPN532.MifareKeyType;
 
 public class Activator implements BundleActivator {
 
