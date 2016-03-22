@@ -1,12 +1,24 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: %Bundle-Name
+Bundle-Name: Pi4j
 Bundle-SymbolicName: com.pi4j
 Bundle-Version: 1.0.0
-Bundle-ClassPath: .
-Bundle-Activator: com.pi4j.service.osgi.Activator
-Export-Package: .,
- com.pi4j.component,
+Bundle-ClassPath: pi4j-core.jar,
+ pi4j-core-javadoc.jar,
+ pi4j-core-sources.jar,
+ pi4j-device.jar,
+ pi4j-device-javadoc.jar,
+ pi4j-device-sources.jar,
+ pi4j-example.jar,
+ pi4j-example-javadoc.jar,
+ pi4j-example-sources.jar,
+ pi4j-gpio-extension.jar,
+ pi4j-gpio-extension-javadoc.jar,
+ pi4j-gpio-extension-sources.jar,
+ pi4j-service.jar,
+ pi4j-service-javadoc.jar,
+ pi4j-service-sources.jar
+Export-Package: com.pi4j.component,
  com.pi4j.component.access,
  com.pi4j.component.button,
  com.pi4j.component.button.impl,
@@ -78,7 +90,5 @@ Export-Package: .,
  com.pi4j.system.service.impl,
  com.pi4j.temperature,
  com.pi4j.util,
- com.pi4j.wiringpi,
- lib
+ com.pi4j.wiringpi
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Import-Package: org.osgi.framework;version="1.8.0"
