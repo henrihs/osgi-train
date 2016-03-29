@@ -10,10 +10,6 @@ public class MifareControllerFactory {
 	private static MifareController instance;
 
 	public static MifareController getInstance() throws SensorInitializationException, InterruptedException, IOException {
-		if (instance == null) {
-			instance = new MifareControllerImpl();
-		}
-		
-		return instance;
+		return new MifareControllerImpl();
 	}
 }
