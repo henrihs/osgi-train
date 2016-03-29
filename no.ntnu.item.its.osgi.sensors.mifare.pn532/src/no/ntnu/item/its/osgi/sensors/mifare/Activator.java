@@ -9,7 +9,9 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogService;
 
 import no.ntnu.item.its.osgi.sensors.common.exceptions.SensorInitializationException;
-import no.ntnu.item.its.osgi.sensors.mifare.IPN532.MifareKeyType;
+import no.ntnu.item.its.osgi.sensors.mifare.pn532.IPN532;
+import no.ntnu.item.its.osgi.sensors.mifare.pn532.PN532Factory;
+import no.ntnu.item.its.osgi.sensors.common.enums.MifareKeyType;
 
 public class Activator implements BundleActivator {
 

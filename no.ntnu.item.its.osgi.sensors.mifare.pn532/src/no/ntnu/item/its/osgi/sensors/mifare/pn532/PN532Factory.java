@@ -1,10 +1,8 @@
-package no.ntnu.item.its.osgi.sensors.mifare;
+package no.ntnu.item.its.osgi.sensors.mifare.pn532;
 
 import java.io.IOException;
 
 import no.ntnu.item.its.osgi.sensors.common.exceptions.SensorInitializationException;
-import no.ntnu.item.its.osgi.sensors.mifare.pn532.PN532;
-import no.ntnu.item.its.osgi.sensors.mifare.pn532.PN532I2C;
 
 public class PN532Factory {
 	
@@ -18,7 +16,7 @@ public class PN532Factory {
 		return instance;
 	}
 	
-	protected static void initializeInstance(int retries) {
+	public static void initializeInstance(int retries) {
 		PN532 pn532 = new PN532(new PN532I2C());
 		while (retries-- > 0) {
 			try {

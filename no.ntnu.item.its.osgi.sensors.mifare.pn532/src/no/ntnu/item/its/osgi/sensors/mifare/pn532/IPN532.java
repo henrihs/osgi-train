@@ -1,7 +1,8 @@
-package no.ntnu.item.its.osgi.sensors.mifare;
+package no.ntnu.item.its.osgi.sensors.mifare.pn532;
 
 import java.io.IOException;
 
+import no.ntnu.item.its.osgi.sensors.common.enums.MifareKeyType;
 import no.ntnu.item.its.osgi.sensors.common.interfaces.SensorHardware;
 
 /*
@@ -9,10 +10,6 @@ import no.ntnu.item.its.osgi.sensors.common.interfaces.SensorHardware;
  */
 public interface IPN532 extends SensorHardware {
 
-	/*
-	 * Key type to use when authenticating Mifare block
-	 */
-	public enum MifareKeyType { A, B }
 	
 	/*
 	 * Authenticate a single Mifare block

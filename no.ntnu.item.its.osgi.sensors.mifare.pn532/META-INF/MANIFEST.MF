@@ -6,6 +6,7 @@ Bundle-Version: 1.0.0
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: com.pi4j.io.i2c,
  com.pi4j.wiringpi,
+ no.ntnu.item.its.osgi.sensors.common,
  no.ntnu.item.its.osgi.sensors.common.enums,
  no.ntnu.item.its.osgi.sensors.common.exceptions,
  no.ntnu.item.its.osgi.sensors.common.interfaces,
