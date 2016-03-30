@@ -1,6 +1,7 @@
 package no.ntnu.item.its.osgi.sensors.mifare;
 
 import java.io.IOException;
+import java.util.function.Function;
 
 import no.ntnu.item.its.osgi.sensors.common.exceptions.SensorInitializationException;
 import no.ntnu.item.its.osgi.sensors.common.interfaces.MifareController;

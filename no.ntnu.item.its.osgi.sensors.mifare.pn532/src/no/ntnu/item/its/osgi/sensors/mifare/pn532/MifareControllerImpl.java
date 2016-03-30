@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.function.Function;
 
 import javax.naming.SizeLimitExceededException;
 
@@ -15,11 +16,12 @@ import no.ntnu.item.its.osgi.sensors.common.interfaces.MifareController;
 public class MifareControllerImpl implements MifareController {
 
 	private final IPN532 pn532;
+	private Function<String, Void> publishersCallback;
 
 	public MifareControllerImpl() throws SensorInitializationException, InterruptedException, IOException{
 		pn532 = PN532Factory.getInstance();
 	}
-	
+		
 	@Override
 	public void write(int block, MifareKeyRing keyRing, String content) throws SensorCommunicationException, SizeLimitExceededException {
 		if (!authenticate(block, keyRing)) {
@@ -56,7 +58,7 @@ public class MifareControllerImpl implements MifareController {
 		
 		return parse(bytesRead);
 	}
-	
+		
 	private byte[] pad(byte[] oldBytes) throws SizeLimitExceededException {
 		if (oldBytes.length > 16) {
 			throw new SizeLimitExceededException("Too large data set");
