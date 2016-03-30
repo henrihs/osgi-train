@@ -19,19 +19,7 @@ public class TCS34725
   public final static int LITTLE_ENDIAN = 0;
   public final static int BIG_ENDIAN    = 1;
   private final static int TCS34725_ENDIANNESS = BIG_ENDIAN;
-  /*
-  Prompt> sudo i2cdetect -y 1
-       0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
-  00:          -- -- -- -- -- -- -- -- -- -- -- -- --
-  10: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-  20: -- -- -- -- -- -- -- -- -- 29 -- -- -- -- -- --
-  30: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-  40: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-  50: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-  60: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-  70: -- -- -- -- -- -- -- --
-   */
-  // This next addresses is returned by "sudo i2cdetect -y 1", see above.
+
   public final static int TCS34725_ADDRESS = 0x29; 
 
 //public final static int TCS34725_ID               = 0x12; // 0x44 = TCS34721/TCS34725, 0x4D = TCS34723/TCS34727
@@ -108,70 +96,39 @@ public class TCS34725
     INTEGRATION_TIME_DELAY.put(TCS34725_INTEGRATIONTIME_154MS, 154000L);   // 154ms - 64 cycles  - Max Count: 65535
     INTEGRATION_TIME_DELAY.put(TCS34725_INTEGRATIONTIME_700MS, 700000L);   // 700ms - 256 cycles - Max Count: 65535
   }
-
-  private static boolean verbose = false;
   
   private I2CBus bus;
   private I2CDevice tcs34725;
   
   private int integrationTime = 0xFF;
-  private int gain            = 0x01;
   
-  public static void setVerbose(boolean b)
-  {
-    verbose = b;
-  }
-  
-  public TCS34725()
+  public TCS34725() throws IOException
   {
     this(TCS34725_ADDRESS);
   }
   
-  public TCS34725(int address)
+  public TCS34725(int address) throws IOException
   {
-    this(address, false, 0xff, 0x01);
+    this(address, 0xff);
   }
   
-  public TCS34725(boolean b, int integrationTime, int gain)
+  public TCS34725(boolean b, int integrationTime) throws IOException
   {
-    this(TCS34725_ADDRESS, b, integrationTime, gain);
-  }
-
-  public TCS34725(int integrationTime, int gain)
-  {
-    this(TCS34725_ADDRESS, false, integrationTime, gain);
+    this(TCS34725_ADDRESS, integrationTime);
   }
   
-  public TCS34725(int address, boolean v, int integrationTime, int gain)
+  public TCS34725(int address, int integrationTime) throws IOException
   {
     this.integrationTime = integrationTime;
-    this.gain = gain;
-    verbose = v;
-    try
-    {
-      // Get i2c bus
-      bus = I2CFactory.getInstance(I2CBus.BUS_1); // Depends onthe RasPI version
-      if (verbose)
-        System.out.println("Connected to bus. OK.");
+    bus = I2CFactory.getInstance(I2CBus.BUS_1);
 
       // Get device itself
       tcs34725 = bus.getDevice(address);
-      if (verbose)
-        System.out.println("Connected to device. OK.");
       
       initialize();
-    }
-    catch (IOException e)
-    {
-      System.err.println(e.getMessage());
-    }
-    catch (Exception e)
-    {
-      System.err.println(e.getMessage());
-    }
   }
   
-  private int initialize() throws Exception
+  private int initialize() throws IOException
   {
     int result = this.readU8(TCS34725_ID);
     if (result != 0x44)
@@ -187,7 +144,7 @@ public class TCS34725
     this.write8(TCS34725_ENABLE, (byte)(TCS34725_ENABLE_PON | TCS34725_ENABLE_AEN));
   }
   
-  public void disable() throws Exception
+  public void disable() throws IOException
   {
     int reg = 0;
     reg = this.readU8(TCS34725_ENABLE);
@@ -200,7 +157,7 @@ public class TCS34725
     this.write8(TCS34725_ATIME, (byte)integrationTime);
   }
         
-  public int getIntegrationTime() throws Exception
+  public int getIntegrationTime() throws IOException 
   {
     return this.readU8(TCS34725_ATIME);
   }
@@ -210,22 +167,22 @@ public class TCS34725
     this.write8(TCS34725_CONTROL, (byte)gain);
   }
         
-  public int getGain() throws Exception
+  public int getGain() throws IOException
   {
     return this.readU8(TCS34725_CONTROL);
   }
   
-  public TCSColor getRawData() throws Exception
+  public int[] getRawData() throws IOException
   {
     int r = this.readU16(TCS34725_RDATAL);
     int b = this.readU16(TCS34725_BDATAL);
     int g = this.readU16(TCS34725_GDATAL);
     int c = this.readU16(TCS34725_CDATAL);
     waitfor((long)(INTEGRATION_TIME_DELAY.get(this.integrationTime) / 1000L));
-    return new TCSColor(c, r, g, b);
+    return new int[] {c, r, g, b};
   }
   
-  public void setInterrupt(boolean intrpt) throws Exception
+  public void setInterrupt(boolean intrpt) throws IOException
   {  
     int r = this.readU8(TCS34725_ENABLE);
     if (intrpt)
@@ -248,69 +205,24 @@ public class TCS34725
     this.write8(0x07, (byte)(high >> 8));
   }
    
-  /*
-   * Converts the raw R/G/B values to color temperature in degrees Kelvin
-   * see http://en.wikipedia.org/wiki/Color_temperature
-   */
-//  public static int calculateColorTemperature(TCSColor rgb)
-//  {
-//    // 1. Map RGB values to their XYZ counterparts.
-//    // Based on 6500K fluorescent, 3000K fluorescent
-//    // and 60W incandescent values for a wide range.
-//    // Note: Y = Illuminance or lux
-//    double X = (-0.14282 * rgb.getR()) + (1.54924 * rgb.getG()) + (-0.95641 * rgb.getB());
-//    double Y = (-0.32466 * rgb.getR()) + (1.57837 * rgb.getG()) + (-0.73191 * rgb.getB());
-//    double Z = (-0.68202 * rgb.getR()) + (0.77073 * rgb.getG()) + ( 0.56332 * rgb.getB());
-//  
-//    // 2. Calculate the chromaticity co-ordinates
-//    double xc = (X) / (X + Y + Z);
-//    double yc = (Y) / (X + Y + Z);
-//  
-//    // 3. Use McCamy's formula to determine the CCT
-//    double n = (xc - 0.3320) / (0.1858 - yc);
-//  
-//    // Calculate the final CCT
-//    double cct = (449.0 * Math.pow(n, 3.0)) + (3525.0 * Math.pow(n, 2.0)) + (6823.3 * n) + 5520.33;
-//  
-//    return (int)cct;
-//  }
-  
-  /*
-   * Values in Lux (or Lumens) per square meter.
-   */
-//  public static int calculateLux(TCSColor rgb)
-//  {
-//    double illuminance = (-0.32466 * rgb.getR()) + (1.57837 * rgb.getG()) + (-0.73191 * rgb.getB());
-//    return (int)illuminance;
-//  }
-
   private void write8(int register, int value) throws IOException
   {
     this.tcs34725.write(TCS34725_COMMAND_BIT | register, (byte)(value & 0xff));
   }
   
-  private int readU16(int register) throws Exception
+  private int readU16(int register) throws IOException
   {
     int lo = this.readU8(register);
     int hi = this.readU8(register + 1);
-    int result = (TCS34725_ENDIANNESS == BIG_ENDIAN) ? (hi << 8) + lo : (lo << 8) + hi; // Big Endian
-    if (verbose)
-      System.out.println("(U16) I2C: Device " + toHex(TCS34725_ADDRESS) + " returned " + toHex(result) + " from reg " + toHex(TCS34725_COMMAND_BIT | register));
+    int result = (TCS34725_ENDIANNESS == BIG_ENDIAN) ? (hi << 8) + lo : (lo << 8) + hi; // Big Endianv
     return result;
   }
   
-  private int readU8(int reg) throws Exception
+  private int readU8(int reg) throws IOException
   {
     // "Read an unsigned byte from the I2C device"
     int result = 0;
-    try
-    {
-      result = this.tcs34725.read(TCS34725_COMMAND_BIT | reg);
-      if (verbose)
-        System.out.println("(U8) I2C: Device " + toHex(TCS34725_ADDRESS) + " returned " + toHex(result) + " from reg " + toHex(TCS34725_COMMAND_BIT | reg));
-    }
-    catch (Exception ex)
-    { ex.printStackTrace(); }
+    result = this.tcs34725.read(TCS34725_COMMAND_BIT | reg);
     return result;
   }
   
@@ -326,93 +238,7 @@ public class TCS34725
   {
     try { Thread.sleep(howMuch); } catch (InterruptedException ie) { ie.printStackTrace(); }
   }
-  
-  public static class TCSColor
-  {
-    private int r, b, g, c;
-    private EColor name;
     
-    public TCSColor(EColor c) {
-    	this(c.getC(), c.getR(), c.getG(), c.getB());
-    	name = c;
-    }
-    
-    public TCSColor(int c, int r, int g, int b)
-    {
-      this.c = c;
-      this.r = r;
-      this.g = g;
-      this.b = b; 
-    }
-    
-	public int getRedComponent() {
-		return getComponent(r);
-	}
-	
-	public int getGreenComponent() {
-		return getComponent(g);
-	}
-	
-	public int getBlueComponent() {
-		return getComponent(b);
-	}
-	
-	private int getComponent(int i) {
-		return i*255/c;
-	}
-    public String getHex() { 
-    	String s = "#";
-    	for (Integer i : new int[] {r,g,b}) {
-			s += Integer.toHexString(getComponent(i));
-		}
-    	
-    	return s;
-    }
-    
-    public String toString() { 
-    	if (name != null) return name.toString();
-    	else return "[ r:" + Integer.toString(r) + 
-                                      ", b:" + Integer.toString(b) + 
-                                      ", g:" + Integer.toString(g) + 
-                                      ", c:" + Integer.toString(c) + "]"; }
-  }
-  
-  private static double colorDistance(TCSColor c1, TCSColor c2) {
-	  int rmean = ( c1.getRedComponent() + c2.getRedComponent()) / 2;
-	  int r = Math.abs(c1.getRedComponent() - c2.getRedComponent());
-	  int g = Math.abs(c1.getGreenComponent() - c2.getGreenComponent());
-	  int b = Math.abs(c1.getBlueComponent() - c2.getBlueComponent());
-	  
-	  return r*r + g*g + b*b;
-  }
-  
-  private static EColor colorApproximation(TCSColor colorToCompare) {
-	  HashMap<EColor, Double> colors = new HashMap<EColor, Double>();
-	  colors.put(EColor.RED,null);
-	  colors.put(EColor.BLUE,null);
-	  colors.put(EColor.GREEN,null);
-	  colors.put(EColor.GRAY,null);
-	  colors.put(EColor.YELLOW,null);
-//	  colors.put(EColor.BROWN,null);
-	  
-	  for (EColor fixedColor : colors.keySet()) {
-		colors.put(fixedColor, Math.abs(colorDistance(colorToCompare, new TCSColor(fixedColor))));
-	  }
-	  
-	  Entry<EColor, Double> minEntry = null;
-	  
-	  for (Entry<EColor, Double> entry : colors.entrySet()) {
-		  if (minEntry == null || entry.getValue() < minEntry.getValue())
-			  minEntry = entry;
-	  }
-	  
-	  if (minEntry.getValue() > 196) { // Don't make too approximated approximations!
-		  return null;
-	  }
-	  
-	  return minEntry.getKey();
-  }
-  
   public static void main(String[] args)
   {
     TCS34725 sensor = new TCS34725(TCS34725_INTEGRATIONTIME_2_4MS, TCS34725_GAIN_1X);
@@ -442,11 +268,7 @@ public class TCS34725
     	  i++;
     	  last = c;
       }
-//      System.out.printf("Color Temperature: %d K%n", colorTemp);
-//      System.out.printf("Luminosity: %d lux%n", lux);
       
-//      sensor.setInterrupt(true);
-//      waitfor(1000L);
       sensor.disable();
     } 
     catch (Exception ex) 
