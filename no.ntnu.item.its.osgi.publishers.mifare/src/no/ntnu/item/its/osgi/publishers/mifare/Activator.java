@@ -83,7 +83,7 @@ public class Activator implements BundleActivator {
 		if (eventAdmin != null) {
 			Dictionary<String, String> properties = new Hashtable<>();
 			properties.put(MifareController.LOC_ID_KEY, content);
-			Event mifareEvent = new Event(MifareController.EVENT_TOPIC, properties);			
+			Event mifareEvent = new Event(MifareController.EVENT_TOPIC, properties);	
 			eventAdmin.postEvent(mifareEvent);
 		}
 	}

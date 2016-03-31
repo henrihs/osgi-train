@@ -1,17 +1,14 @@
 package no.ntnu.item.its.osgi.test;
 
-import java.io.IOException;
-import java.util.Arrays;
-
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventHandler;
 
-import no.ntnu.item.its.osgi.sensors.common.exceptions.SensorInitializationException;
-import no.ntnu.item.its.osgi.sensors.mifare.pn532.IPN532;
-import no.ntnu.item.its.osgi.sensors.mifare.pn532.PN532Factory;
-import no.ntnu.item.its.osgi.sensors.common.enums.MifareKeyType;
+import no.ntnu.item.its.osgi.sensors.common.interfaces.ColorController;
+import no.ntnu.item.its.osgi.sensors.common.interfaces.MifareController;
 
-public class Activator implements BundleActivator {
+public class Activator implements BundleActivator, EventHandler {
 
 	private static BundleContext context;
 
@@ -28,22 +25,8 @@ public class Activator implements BundleActivator {
 	 */
 	public void start(BundleContext bundleContext) throws Exception {
 		Activator.context = bundleContext;
-		readMiFareBlock10();
-	}
-
-	private void readMiFareBlock10() throws InterruptedException, SensorInitializationException, IOException {
-			IPN532 pn = PN532Factory.getInstance();
-			byte[] key = new byte[6];
-			Arrays.fill(key, (byte)0xFF);
-			byte[] uid = new byte[16];
-			int uidLen = pn.readPassiveTargetID((byte)0x00, uid);
-			if (uidLen > 0) {
-				uid = Arrays.copyOf(uid, uidLen);
-				pn.authenticateMifareBlock((byte)10, MifareKeyType.A, key, uid);
-				byte[] blockContent = new byte[16];
-				pn.readMifareBlock((byte)10, blockContent);
-				printBuffer(10, blockContent);	
-			}
+		
+		bundleContext.registerService(EventHandler.class, this, null);
 	}
 
 	/*
@@ -54,21 +37,16 @@ public class Activator implements BundleActivator {
 		Activator.context = null;
 	}
 
-	private static String printSignedHex(byte b) {
-		if (b < 0) {
-			String s = Integer.toHexString(b);
-			return (s.substring(s.length()-2));
+	@Override
+	public void handleEvent(Event arg0) {
+		if (arg0.getTopic().equals(ColorController.EVENT_TOPIC)) {
+			System.out.println(arg0.getProperty(ColorController.COLOR_KEY));
+		} 
+		else if (arg0.getTopic().equals(MifareController.EVENT_TOPIC)) {
+			System.out.println(arg0.getProperty(MifareController.LOC_ID_KEY));
 		}
-		else return (Integer.toHexString(b));
+		
 	}
 
-	private static void printBuffer(int i, byte[] dataBuffer) {
-		String s = (String.format("Block %d content: [", i));
-		for (int j = 0; j < 16; j++) {
-			s += printSignedHex( dataBuffer[j] );
-		}
-		s += ("]");
-		System.out.println(s);
-	}
 
 }
