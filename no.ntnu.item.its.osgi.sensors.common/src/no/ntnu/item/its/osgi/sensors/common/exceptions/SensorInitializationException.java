@@ -14,4 +14,8 @@ public class SensorInitializationException extends Exception {
 	public SensorInitializationException(String message) {
 		super(message);
 	}
+
+	public SensorInitializationException(String message, Throwable throwable) {
+		super(message, throwable);
+	}
 }

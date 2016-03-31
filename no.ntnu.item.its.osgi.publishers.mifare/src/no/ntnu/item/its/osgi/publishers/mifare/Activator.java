@@ -24,6 +24,8 @@ public class Activator implements BundleActivator {
 	private ServiceReference<SensorSchedulerService> schedulerRef;
 	private ServiceReference<EventAdmin> eventAdminRef;
 
+	private Runnable runnableSensorReading;
+
 	static BundleContext getContext() {
 		return context;
 	}
@@ -37,7 +39,7 @@ public class Activator implements BundleActivator {
 		
 		MifareController mc = MifareControllerFactory.getInstance();
 		MifareKeyRing keyRing = new MifareKeyRing(MifareKeyType.A);
-		Runnable r = new Runnable() {
+		runnableSensorReading = new Runnable() {
 			
 			@Override
 			public void run() {
@@ -59,7 +61,7 @@ public class Activator implements BundleActivator {
 		
 		SensorSchedulerService scheduler = bundleContext.getService(schedulerRef);
 		if (scheduler != null) {
-			scheduler.add(r, SCHEDULE_PERIOD);
+			scheduler.add(runnableSensorReading, SCHEDULE_PERIOD);
 		}
 	}
 
@@ -68,6 +70,11 @@ public class Activator implements BundleActivator {
 	 * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext bundleContext) throws Exception {
+		SensorSchedulerService scheduler = bundleContext.getService(schedulerRef);
+		if (scheduler != null) {
+			scheduler.remove(runnableSensorReading);
+		}
+		
 		Activator.context = null;
 	}
 	

@@ -1,31 +1,15 @@
-package no.ntnu.item.its.train.tcs;
-
-import com.pi4j.io.i2c.I2CBus;
-import com.pi4j.io.i2c.I2CDevice;
-import com.pi4j.io.i2c.I2CFactory;
-import com.pi4j.system.SystemInfo;
-
-import java.io.IOException;
+package no.ntnu.item.its.osgi.sensors.color.impl;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
-/*
- * Light sensor
- */
-public class TCS34725
-{
+public class Constants {
+
 	public final static int LITTLE_ENDIAN = 0;
 	public final static int BIG_ENDIAN    = 1;
-	private final static int TCS34725_ENDIANNESS = BIG_ENDIAN;
-
-	public final static int TCS34725_ADDRESS = 0x29; 
-
-	//public final static int TCS34725_ID               = 0x12; // 0x44 = TCS34721/TCS34725, 0x4D = TCS34723/TCS34727
-
+	final static int TCS34725_ENDIANNESS = BIG_ENDIAN;
+	public final static int TCS34725_ADDRESS = 0x29;
 	public final static int TCS34725_COMMAND_BIT      = 0x80;
-
 	public final static int TCS34725_ENABLE           = 0x00;
 	public final static int TCS34725_ENABLE_AIEN      = 0x10; // RGBC Interrupt Enable
 	public final static int TCS34725_ENABLE_WEN       = 0x08; // Wait enable - Writing 1 activates the wait timer
@@ -64,7 +48,6 @@ public class TCS34725
 	public final static int TCS34725_STATUS           = 0x13;
 	public final static int TCS34725_STATUS_AINT      = 0x10; // RGBC Clean channel interrupt
 	public final static int TCS34725_STATUS_AVALID    = 0x01; // Indicates that the RGBC channels have completed an integration cycle
-
 	public final static int TCS34725_CDATAL           = 0x14; // Clear channel data
 	public final static int TCS34725_CDATAH           = 0x15;
 	public final static int TCS34725_RDATAL           = 0x16; // Red channel data
@@ -73,201 +56,26 @@ public class TCS34725
 	public final static int TCS34725_GDATAH           = 0x19;
 	public final static int TCS34725_BDATAL           = 0x1A; // Blue channel data
 	public final static int TCS34725_BDATAH           = 0x1B;
-
 	public final static int TCS34725_INTEGRATIONTIME_2_4MS  = 0xFF;   //  2.4ms - 1 cycle    - Max Count: 1024
 	public final static int TCS34725_INTEGRATIONTIME_24MS   = 0xF6;   // 24ms  - 10 cycles  - Max Count: 10240
 	public final static int TCS34725_INTEGRATIONTIME_50MS   = 0xEB;   //  50ms  - 20 cycles  - Max Count: 20480
 	public final static int TCS34725_INTEGRATIONTIME_101MS  = 0xD5;   //  101ms - 42 cycles  - Max Count: 43008
 	public final static int TCS34725_INTEGRATIONTIME_154MS  = 0xC0;   //  154ms - 64 cycles  - Max Count: 65535
 	public final static int TCS34725_INTEGRATIONTIME_700MS  = 0x00;   //  700ms - 256 cycles - Max Count: 65535
-
 	public final static int TCS34725_GAIN_1X                = 0x00;   //  No gain
 	public final static int TCS34725_GAIN_4X                = 0x01;   //  4x gain
 	public final static int TCS34725_GAIN_16X               = 0x02;   //  16x gain
 	public final static int TCS34725_GAIN_60X               = 0x03;   //  60x gain
-
 	public final static Map<Integer, Long> INTEGRATION_TIME_DELAY = new HashMap<Integer, Long>();
+	
 	static
 	{ //                                Microseconds                              
-		INTEGRATION_TIME_DELAY.put(TCS34725_INTEGRATIONTIME_2_4MS,  2400L);   // 2.4ms - 1 cycle    - Max Count: 1024
-		INTEGRATION_TIME_DELAY.put(TCS34725_INTEGRATIONTIME_24MS,  24000L);   // 24ms  - 10 cycles  - Max Count: 10240
-		INTEGRATION_TIME_DELAY.put(TCS34725_INTEGRATIONTIME_50MS,  50000L);   // 50ms  - 20 cycles  - Max Count: 20480
-		INTEGRATION_TIME_DELAY.put(TCS34725_INTEGRATIONTIME_101MS, 101000L);   // 101ms - 42 cycles  - Max Count: 43008
-		INTEGRATION_TIME_DELAY.put(TCS34725_INTEGRATIONTIME_154MS, 154000L);   // 154ms - 64 cycles  - Max Count: 65535
-		INTEGRATION_TIME_DELAY.put(TCS34725_INTEGRATIONTIME_700MS, 700000L);   // 700ms - 256 cycles - Max Count: 65535
+		Constants.INTEGRATION_TIME_DELAY.put(Constants.TCS34725_INTEGRATIONTIME_2_4MS,  2400L);   // 2.4ms - 1 cycle    - Max Count: 1024
+		Constants.INTEGRATION_TIME_DELAY.put(Constants.TCS34725_INTEGRATIONTIME_24MS,  24000L);   // 24ms  - 10 cycles  - Max Count: 10240
+		Constants.INTEGRATION_TIME_DELAY.put(Constants.TCS34725_INTEGRATIONTIME_50MS,  50000L);   // 50ms  - 20 cycles  - Max Count: 20480
+		Constants.INTEGRATION_TIME_DELAY.put(Constants.TCS34725_INTEGRATIONTIME_101MS, 101000L);   // 101ms - 42 cycles  - Max Count: 43008
+		Constants.INTEGRATION_TIME_DELAY.put(Constants.TCS34725_INTEGRATIONTIME_154MS, 154000L);   // 154ms - 64 cycles  - Max Count: 65535
+		Constants.INTEGRATION_TIME_DELAY.put(Constants.TCS34725_INTEGRATIONTIME_700MS, 700000L);   // 700ms - 256 cycles - Max Count: 65535
 	}
 
-	private I2CBus bus;
-	private I2CDevice tcs34725;
-
-	private int integrationTime = 0xFF;
-
-	public TCS34725() throws IOException
-	{
-		this(TCS34725_ADDRESS);
-	}
-
-	public TCS34725(int address) throws IOException
-	{
-		this(address, 0xff);
-	}
-
-	public TCS34725(boolean b, int integrationTime) throws IOException
-	{
-		this(TCS34725_ADDRESS, integrationTime);
-	}
-
-	public TCS34725(int address, int integrationTime) throws IOException
-	{
-		this.integrationTime = integrationTime;
-		bus = I2CFactory.getInstance(I2CBus.BUS_1);
-
-		// Get device itself
-		tcs34725 = bus.getDevice(address);
-
-		initialize();
-	}
-
-	private int initialize() throws IOException
-	{
-		int result = this.readU8(TCS34725_ID);
-		if (result != 0x44)
-			return -1;
-		enable();
-		return 0;
-	}
-
-	public void enable() throws IOException
-	{
-		this.write8(TCS34725_ENABLE, (byte)TCS34725_ENABLE_PON);
-		waitfor(10L);
-		this.write8(TCS34725_ENABLE, (byte)(TCS34725_ENABLE_PON | TCS34725_ENABLE_AEN));
-	}
-
-	public void disable() throws IOException
-	{
-		int reg = 0;
-		reg = this.readU8(TCS34725_ENABLE);
-		this.write8(TCS34725_ENABLE, (byte)(reg & ~(TCS34725_ENABLE_PON | TCS34725_ENABLE_AEN)));    
-	}
-
-	public void setIntegrationTime(int integrationTime) throws IOException
-	{
-		this.integrationTime = integrationTime;
-		this.write8(TCS34725_ATIME, (byte)integrationTime);
-	}
-
-	public int getIntegrationTime() throws IOException 
-	{
-		return this.readU8(TCS34725_ATIME);
-	}
-
-	public void setGain(int gain) throws IOException
-	{
-		this.write8(TCS34725_CONTROL, (byte)gain);
-	}
-
-	public int getGain() throws IOException
-	{
-		return this.readU8(TCS34725_CONTROL);
-	}
-
-	public int[] getRawData() throws IOException
-	{
-		int c = this.readU16(TCS34725_CDATAL);
-		int r = this.readU16(TCS34725_RDATAL);
-		int g = this.readU16(TCS34725_GDATAL);
-		int b = this.readU16(TCS34725_BDATAL);
-		waitfor((long)(INTEGRATION_TIME_DELAY.get(this.integrationTime) / 1000L));
-		return new int[] {c, r, g, b};
-	}
-
-	public void setInterrupt(boolean intrpt) throws IOException
-	{  
-		int r = this.readU8(TCS34725_ENABLE);
-		if (intrpt)
-			r |= TCS34725_ENABLE_AIEN;
-		else
-			r &= ~TCS34725_ENABLE_AIEN;
-		this.write8(TCS34725_ENABLE, (byte)r);
-	}
-
-	public void clearInterrupt() throws IOException
-	{
-		tcs34725.write((byte)(0x66 & 0xff));
-	}
-
-	public void setIntLimits(int low, int high) throws IOException
-	{
-		this.write8(0x04, (byte)(low & 0xFF));
-		this.write8(0x05, (byte)(low >> 8));
-		this.write8(0x06, (byte)(high & 0xFF));
-		this.write8(0x07, (byte)(high >> 8));
-	}
-
-	private void write8(int register, int value) throws IOException
-	{
-		this.tcs34725.write(TCS34725_COMMAND_BIT | register, (byte)(value & 0xff));
-	}
-
-	private int readU16(int register) throws IOException
-	{
-		int lo = this.readU8(register);
-		int hi = this.readU8(register + 1);
-		int result = (TCS34725_ENDIANNESS == BIG_ENDIAN) ? (hi << 8) + lo : (lo << 8) + hi; // Big Endianv
-		return result;
-	}
-
-	private int readU8(int reg) throws IOException
-	{
-		// "Read an unsigned byte from the I2C device"
-		int result = 0;
-		result = this.tcs34725.read(TCS34725_COMMAND_BIT | reg);
-		return result;
-	}
-
-	private static String toHex(int i)
-	{
-		String s = Integer.toString(i, 16).toUpperCase();
-		while (s.length() % 2 != 0)
-			s = "0" + s;
-		return "0x" + s;
-	}
-
-	private static void waitfor(long howMuch)
-	{
-		try { Thread.sleep(howMuch); } catch (InterruptedException ie) { ie.printStackTrace(); }
-	}
-
-	public static void main(String[] args)
-	{
-		TCS34725 sensor = new TCS34725(TCS34725_INTEGRATIONTIME_2_4MS, TCS34725_GAIN_1X);
-
-		sensor.enable();
-		//      System.out.println(".. Setting interrupt");
-		//      sensor.setInterrupt(false);
-		waitfor(1000L);
-		//      System.out.println(".. Getting raw data");
-		//      System.out.println(".. Calculating");
-		//      int colorTemp = TCS34725.calculateColorTemperature(rgb);
-		//      int lux       = TCS34725.calculateLux(rgb);
-		//      System.out.println(rgb.toString());
-		//      System.out.printf("Hex: %s%n", rgb.getHex());
-		int i = 0;
-		EColor c,last = null;
-		while (i < 100) {
-			int[] rgb = sensor.getRawData();
-			c = colorApproximation(rgb);
-			if (c == null || c.equals(last)) {
-				continue;
-			}
-
-			System.out.println(c);
-			i++;
-			last = c;
-		}
-
-		sensor.disable();
-
-	}
 }

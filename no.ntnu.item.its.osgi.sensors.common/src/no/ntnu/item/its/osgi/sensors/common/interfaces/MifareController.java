@@ -30,6 +30,8 @@ public interface MifareController {
 	 * 
 	 * @param block the block to read from
 	 * @param keyRing the key used to authenticate the Mifare block in question
+	 * 
+	 * @returns the content from the block in question, represented as a String value
 	 */
 	public String read(int block, MifareKeyRing keyRing) throws SensorCommunicationException;
 	
