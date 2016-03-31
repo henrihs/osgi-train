@@ -2,13 +2,17 @@ package no.ntnu.item.its.osgi.test;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
+import org.osgi.service.log.LogEntry;
+import org.osgi.service.log.LogListener;
+import org.osgi.service.log.LogReaderService;
 
 import no.ntnu.item.its.osgi.sensors.common.interfaces.ColorController;
 import no.ntnu.item.its.osgi.sensors.common.interfaces.MifareController;
 
-public class Activator implements BundleActivator, EventHandler {
+public class Activator implements BundleActivator, EventHandler, LogListener {
 
 	private static BundleContext context;
 
@@ -26,7 +30,12 @@ public class Activator implements BundleActivator, EventHandler {
 	public void start(BundleContext bundleContext) throws Exception {
 		Activator.context = bundleContext;
 		
-		bundleContext.registerService(EventHandler.class, this, null);
+		bundleContext.registerService(EventHandler.class.getName(), this, null);
+		ServiceReference readerRef = context.getServiceReference(LogReaderService.class.getName());
+		if (readerRef != null) {
+			LogReaderService reader = (LogReaderService) context.getService(readerRef);
+			reader.addLogListener(this);
+		}
 	}
 
 	/*
@@ -46,6 +55,15 @@ public class Activator implements BundleActivator, EventHandler {
 			System.out.println(arg0.getProperty(MifareController.LOC_ID_KEY));
 		}
 		
+	}
+
+	@Override
+	public void logged(LogEntry arg0) {
+		System.out.println(String.format(
+				"[%d]%s: %s",
+				arg0.getLevel(), 
+				arg0.getBundle(), 
+				arg0.getMessage()));				
 	}
 
 

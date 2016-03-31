@@ -8,6 +8,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
+import org.osgi.service.log.LogService;
 
 import no.ntnu.item.its.osgi.sensors.common.interfaces.MifareController;
 import no.ntnu.item.its.osgi.sensors.common.interfaces.SensorSchedulerService;
@@ -25,6 +26,8 @@ public class Activator implements BundleActivator {
 	private ServiceReference<EventAdmin> eventAdminRef;
 
 	private Runnable runnableSensorReading;
+
+	private ServiceReference<LogService> logRef;
 
 	static BundleContext getContext() {
 		return context;
@@ -47,6 +50,9 @@ public class Activator implements BundleActivator {
 				try {
 					content = mc.read(42,keyRing);
 				} catch (SensorCommunicationException e) {
+					if (logRef != null) {
+						context.getService(logRef).log(LogService.LOG_DEBUG, "", e);
+					}
 					return;
 				}
 				
@@ -56,6 +62,7 @@ public class Activator implements BundleActivator {
 			}
 		};
 		
+		logRef = bundleContext.getServiceReference(LogService.class);
 		schedulerRef = bundleContext.getServiceReference(SensorSchedulerService.class);
 		eventAdminRef = bundleContext.getServiceReference(EventAdmin.class);
 		
@@ -70,10 +77,11 @@ public class Activator implements BundleActivator {
 	 * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext bundleContext) throws Exception {
-		SensorSchedulerService scheduler = bundleContext.getService(schedulerRef);
-		if (scheduler != null) {
-			scheduler.remove(runnableSensorReading);
-		}
+		runnableSensorReading = null;
+//		SensorSchedulerService scheduler = bundleContext.getService(schedulerRef);
+//		if (scheduler != null) {
+//			scheduler.remove(runnableSensorReading);
+//		}
 		
 		Activator.context = null;
 	}
@@ -85,6 +93,10 @@ public class Activator implements BundleActivator {
 			properties.put(MifareController.LOC_ID_KEY, content);
 			Event mifareEvent = new Event(MifareController.EVENT_TOPIC, properties);	
 			eventAdmin.postEvent(mifareEvent);
+			if (logRef != null) {
+				context.getService(logRef).log(LogService.LOG_DEBUG, "Posted event to EventAdmin", null);
+			}
+			
 		}
 	}
 

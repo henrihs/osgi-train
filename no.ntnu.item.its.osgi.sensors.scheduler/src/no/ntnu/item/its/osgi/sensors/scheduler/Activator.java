@@ -1,10 +1,14 @@
 package no.ntnu.item.its.osgi.sensors.scheduler;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.log.LogService;
 
 import no.ntnu.item.its.osgi.sensors.common.interfaces.SensorSchedulerService;
 
@@ -16,7 +20,8 @@ public class Activator implements BundleActivator, SensorSchedulerService {
 		return context;
 	}
 
-	private ScheduledThreadPoolExecutor scheduler;
+	private ScheduledExecutorService scheduler;
+	private ServiceReference<LogService> logRef;
 
 	/*
 	 * (non-Javadoc)
@@ -24,9 +29,10 @@ public class Activator implements BundleActivator, SensorSchedulerService {
 	 */
 	public void start(BundleContext bundleContext) throws Exception {
 		Activator.context = bundleContext;
-		this.scheduler = new ScheduledThreadPoolExecutor(0); 
+		this.scheduler = Executors.newScheduledThreadPool(0); 
 		
-		bundleContext.registerService(SensorSchedulerService.class.getName(), this, null);
+		logRef = bundleContext.getServiceReference(LogService.class);
+		bundleContext.registerService(SensorSchedulerService.class, this, null);
 	}
 
 	/*
@@ -41,12 +47,19 @@ public class Activator implements BundleActivator, SensorSchedulerService {
 	@Override
 	public void add(Runnable r, long period) {
 		scheduler.scheduleAtFixedRate(r, period, period, TimeUnit.MICROSECONDS);
-		
+		if (logRef != null) {
+			context.getService(logRef).log(LogService.LOG_INFO, String.format("Added runnable with hashCode %d", r.hashCode()));
+		}
 	}
 
 	@Override
 	public boolean remove(Runnable r) {
-		return scheduler.remove(r);
+		return false;
+//		if (logRef != null) {
+//			context.getService(logRef).log(LogService.LOG_INFO, String.format("Removing runnable with hashCode %d", r.hashCode()));
+//		}
+//		
+//		return scheduler.;
 	}
 
 }

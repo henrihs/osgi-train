@@ -17,5 +17,6 @@
 	<classpathentry kind="lib" path="../lib/pi4j-1.0/lib/pi4j-service.jar"/>
 	<classpathentry kind="lib" path="../lib/pi4j-1.0/lib/pi4j-service-javadoc.jar"/>
 	<classpathentry kind="lib" path="../lib/pi4j-1.0/lib/pi4j-service-sources.jar"/>
+	<classpathentry kind="src" path="/com.pi4j"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

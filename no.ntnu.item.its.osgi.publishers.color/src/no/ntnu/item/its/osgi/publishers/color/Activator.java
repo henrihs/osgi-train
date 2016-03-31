@@ -52,8 +52,6 @@ public class Activator implements BundleActivator {
 		cc = ColorControllerFactory.getInstance();
 		runnableSensorReading = new Runnable() {
 			
-			private EColor lastPublishedColor;
-
 			@Override
 			public void run() {
 				int[] rawColor;
@@ -90,6 +88,7 @@ public class Activator implements BundleActivator {
 			properties.put(ColorController.COLOR_KEY, color);
 			Event mifareEvent = new Event(ColorController.EVENT_TOPIC, properties);			
 			eventAdmin.postEvent(mifareEvent);
+			lastPublishedColor = color;
 		}
 	}
 	/*

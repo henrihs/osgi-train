@@ -9,7 +9,7 @@ import no.ntnu.item.its.osgi.sensors.common.interfaces.ColorController;
 public class ColorControllerFactory {
 
 	public static ColorController getInstance() throws SensorInitializationException, SensorCommunicationException {
-		TCS34725 controller =  new TCS34725(Constants.TCS34725_INTEGRATIONTIME_2_4MS, Constants.TCS34725_GAIN_1X);
+		TCS34725 controller =  new TCS34725(Constants.TCS34725_ADDRESS, Constants.TCS34725_INTEGRATIONTIME_2_4MS);
 		return controller;
 	}
 }
