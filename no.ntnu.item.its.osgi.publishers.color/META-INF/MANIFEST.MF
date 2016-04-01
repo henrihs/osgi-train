@@ -10,4 +10,6 @@ Import-Package: no.ntnu.item.its.osgi.sensors.color,
  no.ntnu.item.its.osgi.sensors.common.exceptions,
  no.ntnu.item.its.osgi.sensors.common.interfaces,
  org.osgi.framework;version="1.3.0",
- org.osgi.service.event;version="1.3.0"
+ org.osgi.service.event;version="1.3.0",
+ org.osgi.service.log;version="1.3.0",
+ org.osgi.util.tracker;version="1.5.1"
