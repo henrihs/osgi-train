@@ -2,7 +2,6 @@ package no.ntnu.item.its.osgi.sensors.scheduler;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.osgi.framework.BundleActivator;
@@ -46,9 +45,10 @@ public class Activator implements BundleActivator, SensorSchedulerService {
 
 	@Override
 	public void add(Runnable r, long period) {
-		scheduler.scheduleAtFixedRate(r, period, period, TimeUnit.MICROSECONDS);
+		scheduler.scheduleAtFixedRate(r, period, period, TimeUnit.MILLISECONDS);
 		if (logRef != null) {
-			context.getService(logRef).log(LogService.LOG_INFO, String.format("Added runnable with hashCode %d", r.hashCode()));
+			context.getService(logRef).log(LogService.LOG_INFO, 
+					String.format("Added runnable with hashCode %d, executing periodically each %d ms", r.hashCode(), period));
 		}
 	}
 
