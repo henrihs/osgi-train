@@ -1,9 +1,12 @@
 package no.ntnu.item.its.osgi.test;
 
+import java.util.Hashtable;
+
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.event.Event;
+import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 import org.osgi.service.log.LogEntry;
 import org.osgi.service.log.LogListener;
@@ -20,6 +23,8 @@ public class Activator implements BundleActivator, EventHandler, LogListener {
 		return context;
 	}
 
+	private String[] topics;
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
@@ -30,8 +35,13 @@ public class Activator implements BundleActivator, EventHandler, LogListener {
 	public void start(BundleContext bundleContext) throws Exception {
 		Activator.context = bundleContext;
 		
-		bundleContext.registerService(EventHandler.class.getName(), this, null);
-		ServiceReference readerRef = context.getServiceReference(LogReaderService.class.getName());
+		topics = new String[] { ColorController.EVENT_TOPIC, MifareController.EVENT_TOPIC };
+		Hashtable<String, Object> serviceProps = new Hashtable<String, Object>();
+		serviceProps.put(EventConstants.EVENT_TOPIC, topics);
+		bundleContext.registerService(EventHandler.class.getName(), this, serviceProps);
+		
+		ServiceReference<LogReaderService> readerRef = (ServiceReference<LogReaderService>) 
+				context.getServiceReference(LogReaderService.class.getName());
 		if (readerRef != null) {
 			LogReaderService reader = (LogReaderService) context.getService(readerRef);
 			reader.addLogListener(this);
