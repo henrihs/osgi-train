@@ -7,18 +7,17 @@ import java.util.Map.Entry;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
-import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 import no.ntnu.item.its.osgi.sensors.color.ColorControllerFactory;
 import no.ntnu.item.its.osgi.sensors.common.enums.EColor;
 import no.ntnu.item.its.osgi.sensors.common.exceptions.SensorCommunicationException;
 import no.ntnu.item.its.osgi.sensors.common.interfaces.ColorController;
 import no.ntnu.item.its.osgi.sensors.common.interfaces.SensorSchedulerService;
+import no.ntnu.item.its.osgi.sensors.common.servicetrackers.SchedulerTrackerCustomizer;
 
 public class Activator implements BundleActivator {
 
@@ -39,8 +38,8 @@ public class Activator implements BundleActivator {
 	}
 
 	private ColorController cc;
-	private ServiceReference<LogService> logRef;
-	private ServiceReference<EventAdmin> eventAdminRef;
+	private ServiceTracker<LogService, Object> logServiceTracker;
+	private ServiceTracker<EventAdmin, Object> eventAdminTracker;
 	private Runnable runnableSensorReading;
 
 	private EColor lastPublishedColor;
@@ -55,35 +54,38 @@ public class Activator implements BundleActivator {
 
 		cc = ColorControllerFactory.getInstance();
 
-		logRef = bundleContext.getServiceReference(LogService.class);
-		eventAdminRef = bundleContext.getServiceReference(EventAdmin.class);
+		logServiceTracker = new ServiceTracker<>(bundleContext, LogService.class, null);
+		logServiceTracker.open();
+		eventAdminTracker = new ServiceTracker<>(bundleContext, EventAdmin.class, null);
+		eventAdminTracker.open();
+		
+		runnableSensorReading = new Runnable() {
 
-		ServiceTracker<SensorSchedulerService, Runnable> schedulerTracker = 
-				new ServiceTracker<SensorSchedulerService, Runnable>(
+			@Override
+			public void run() {
+				int[] rawColor;
+				try {
+					rawColor = cc.getRawData();
+				} catch (SensorCommunicationException e) {
+					return;
+				}
+
+				if (rawColor != null) {
+					EColor color = colorApproximation(rawColor);
+					System.out.println("publish");
+					publish(color);
+				}
+			}
+		};
+
+		ServiceTracker schedulerTracker = 
+				new ServiceTracker(
 						bundleContext, 
 						SensorSchedulerService.class, 
-						new SchedulerTrackerCustomizer());
+						new SchedulerTrackerCustomizer(bundleContext, runnableSensorReading, SCHEDULE_PERIOD));
 		schedulerTracker.open();
 	}
 
-	private void publish(EColor color){
-		if (color == null || color.equals(lastPublishedColor)) {
-			return;
-		}
-
-		if (eventAdminRef != null) {
-			EventAdmin eventAdmin = getContext().getService(eventAdminRef);
-			Map<String, EColor> properties = new Hashtable<>();
-			properties.put(ColorController.COLOR_KEY, color);
-			Event mifareEvent = new Event(ColorController.EVENT_TOPIC, properties);			
-			eventAdmin.postEvent(mifareEvent);
-			lastPublishedColor = color;
-		}
-		
-		else if (logRef != null) {
-			context.getService(logRef).log(LogService.LOG_INFO, "Failed to publish event, no EventAdmin service available!");
-		}
-	}
 	/*
 	 * (non-Javadoc)
 	 * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
@@ -91,6 +93,27 @@ public class Activator implements BundleActivator {
 	public void stop(BundleContext bundleContext) throws Exception {
 		runnableSensorReading = null;
 		Activator.context = null;
+	}
+	
+	private void publish(EColor color){
+		if (color == null || color.equals(lastPublishedColor)) {
+			return;
+		}
+		
+		if (!eventAdminTracker.isEmpty()) {
+			Map<String, EColor> properties = new Hashtable<>();
+			properties.put(ColorController.COLOR_KEY, color);
+			Event mifareEvent = new Event(ColorController.EVENT_TOPIC, properties);			
+			((EventAdmin) eventAdminTracker.getService()).postEvent(mifareEvent);
+			((LogService) logServiceTracker.getService()).log(LogService.LOG_DEBUG, "Posted event");
+			lastPublishedColor = color;
+		}
+		
+		else if (!logServiceTracker.isEmpty()) {
+		((LogService) logServiceTracker.getService()).log(
+				LogService.LOG_DEBUG, 
+				"Failed to publish event, no EventAdmin service available!");
+		}
 	}
 
 	private static EColor colorApproximation(int[] rawColor) {
@@ -113,56 +136,4 @@ public class Activator implements BundleActivator {
 
 		return minEntry.getKey().getType();
 	}
-
-	private class SchedulerTrackerCustomizer implements 
-	ServiceTrackerCustomizer<SensorSchedulerService, Runnable> {
-
-		@Override
-		public Runnable addingService(ServiceReference<SensorSchedulerService> arg0) {
-			runnableSensorReading = new Runnable() {
-
-				@Override
-				public void run() {
-					int[] rawColor;
-					try {
-						rawColor = cc.getRawData();
-					} catch (SensorCommunicationException e) {
-						return;
-					}
-
-					if (rawColor != null) {
-						EColor color = colorApproximation(rawColor);
-						publish(color);
-					}
-				}
-			};
-
-			SensorSchedulerService scheduler = context.getService(arg0);
-			scheduler.add(runnableSensorReading, SCHEDULE_PERIOD);
-			if (logRef != null) {
-				context.getService(logRef).log(
-						LogService.LOG_INFO, 
-						String.format("Executing periodic sensor readings via %s", 
-								arg0.getBundle().getSymbolicName()));
-			}
-
-			return null;
-		}
-
-		@Override
-		public void modifiedService(ServiceReference<SensorSchedulerService> arg0, Runnable arg1) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public void removedService(ServiceReference<SensorSchedulerService> arg0, Runnable arg1) {
-			if (logRef != null) {
-				context.getService(logRef).log(
-						LogService.LOG_WARNING, 
-						"No longer executing sensor readings, scheduling service is down!");
-			}
-		}
-	}
-
 }

@@ -2,6 +2,7 @@ package no.ntnu.item.its.osgi.publishers.mifare;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.Map;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -14,6 +15,7 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 import no.ntnu.item.its.osgi.sensors.common.interfaces.MifareController;
 import no.ntnu.item.its.osgi.sensors.common.interfaces.SensorSchedulerService;
+import no.ntnu.item.its.osgi.sensors.common.servicetrackers.SchedulerTrackerCustomizer;
 import no.ntnu.item.its.osgi.sensors.mifare.*;
 import no.ntnu.item.its.osgi.sensors.common.*;
 import no.ntnu.item.its.osgi.sensors.common.enums.*;
@@ -24,11 +26,11 @@ public class Activator implements BundleActivator {
 	public static final long SCHEDULE_PERIOD = 1000;
 
 	private static BundleContext context;
-	private ServiceReference<EventAdmin> eventAdminRef;
+	private ServiceTracker<EventAdmin, Object> eventAdminTracker;
+	private ServiceTracker<LogService, Object> logServiceTracker;
 
 	private Runnable runnableSensorReading;
 
-	private ServiceReference<LogService> logRef;
 
 	private MifareController mc;
 
@@ -45,14 +47,34 @@ public class Activator implements BundleActivator {
 		
 		mc = MifareControllerFactory.getInstance();
 		
-		logRef = bundleContext.getServiceReference(LogService.class);
-		eventAdminRef = bundleContext.getServiceReference(EventAdmin.class);
+		logServiceTracker = new ServiceTracker<>(bundleContext, LogService.class, null);
+		logServiceTracker.open();
+		eventAdminTracker = new ServiceTracker<>(bundleContext, EventAdmin.class, null);
+		eventAdminTracker.open();
 		
-		ServiceTracker<SensorSchedulerService, Runnable> schedulerTracker = 
-				new ServiceTracker<SensorSchedulerService, Runnable>(
+		runnableSensorReading = new Runnable() {
+			
+			@Override
+			public void run() {
+				String content;
+				try {
+					content = mc.read(42, new MifareKeyRing(MifareKeyType.A));
+				} catch (SensorCommunicationException e) {
+					return;
+				}
+				
+				if (!content.isEmpty()) {
+					System.out.println("pub mifare");
+					publish(content);
+				}
+			}
+		};
+		
+		ServiceTracker<SensorSchedulerService, Object> schedulerTracker = 
+				new ServiceTracker<SensorSchedulerService, Object>(
 						bundleContext, 
 						SensorSchedulerService.class, 
-						new SchedulerTrackerCustomizer());
+						new SchedulerTrackerCustomizer(bundleContext, runnableSensorReading, SCHEDULE_PERIOD));
 		schedulerTracker.open();
 		
 		
@@ -73,71 +95,19 @@ public class Activator implements BundleActivator {
 	}
 	
 	private void publish(String content){
-		if (eventAdminRef != null) {
-			EventAdmin eventAdmin = getContext().getService(eventAdminRef);
-			Dictionary<String, String> properties = new Hashtable<>();
+		System.out.println("enter pub");
+		EventAdmin ea = (EventAdmin) eventAdminTracker.getService();
+		if (ea != null) {
+			System.out.println("enter if");
+			Map<String, Object> properties = new Hashtable<String, Object>();
 			properties.put(MifareController.LOC_ID_KEY, content);
 			Event mifareEvent = new Event(MifareController.EVENT_TOPIC, properties);	
-			eventAdmin.postEvent(mifareEvent);
-			if (logRef != null) {
-				context.getService(logRef).log(
-						LogService.LOG_DEBUG, "Posted event to EventAdmin");
-			}
+			((EventAdmin) eventAdminTracker.getService()).sendEvent(mifareEvent);
 			
 		}
 		
-		else if (logRef != null) {
-			context.getService(logRef).log(LogService.LOG_INFO, "Failed to publish event, no EventAdmin service available!");
-		}
-	}
-	
-	private class SchedulerTrackerCustomizer implements 
-		ServiceTrackerCustomizer<SensorSchedulerService, Runnable> {
-		
-		@Override
-		public Runnable addingService(ServiceReference<SensorSchedulerService> arg0) {
-			runnableSensorReading = new Runnable() {
-				
-				@Override
-				public void run() {
-					String content;
-					try {
-						content = mc.read(42, new MifareKeyRing(MifareKeyType.A));
-					} catch (SensorCommunicationException e) {
-						return;
-					}
-					
-					if (!content.isEmpty()) {
-						publish(content);
-					}
-				}
-			};
-			
-			SensorSchedulerService scheduler = context.getService(arg0);
-			scheduler.add(runnableSensorReading, SCHEDULE_PERIOD);
-			if (logRef != null) {
-				context.getService(logRef).log(
-						LogService.LOG_INFO, 
-						String.format("Executing periodic sensor readings via %s", 
-								arg0.getBundle().getSymbolicName()));
-			}
-			
-			return null;
-		}
-
-		@Override
-		public void modifiedService(ServiceReference<SensorSchedulerService> arg0, Runnable arg1) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void removedService(ServiceReference<SensorSchedulerService> arg0, Runnable arg1) {
-			if (logRef != null) {
-				context.getService(logRef).log(
-						LogService.LOG_WARNING, 
-						"No longer executing sensor readings, scheduling service is down!");
-			}
+		else if (!logServiceTracker.isEmpty()) {
+			((LogService) logServiceTracker.getService()).log(LogService.LOG_INFO, "Failed to publish event, no EventAdmin service available!");
 		}
 	}
 
