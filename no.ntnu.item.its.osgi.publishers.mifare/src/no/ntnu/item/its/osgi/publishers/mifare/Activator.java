@@ -1,17 +1,14 @@
 package no.ntnu.item.its.osgi.publishers.mifare;
 
-import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Map;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
-import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 import no.ntnu.item.its.osgi.sensors.common.interfaces.MifareController;
 import no.ntnu.item.its.osgi.sensors.common.interfaces.SensorSchedulerService;
@@ -59,14 +56,13 @@ public class Activator implements BundleActivator {
 				String content;
 				try {
 					content = mc.read(42, new MifareKeyRing(MifareKeyType.A));
+					if (!content.isEmpty()) {
+						publish(content);
+					}
 				} catch (SensorCommunicationException e) {
 					return;
 				}
 				
-				if (!content.isEmpty()) {
-					System.out.println("pub mifare");
-					publish(content);
-				}
 			}
 		};
 		
@@ -95,14 +91,17 @@ public class Activator implements BundleActivator {
 	}
 	
 	private void publish(String content){
-		System.out.println("enter pub");
 		EventAdmin ea = (EventAdmin) eventAdminTracker.getService();
 		if (ea != null) {
-			System.out.println("enter if");
-			Map<String, Object> properties = new Hashtable<String, Object>();
+			Map<String, String> properties = new Hashtable<String, String>();
 			properties.put(MifareController.LOC_ID_KEY, content);
-			Event mifareEvent = new Event(MifareController.EVENT_TOPIC, properties);	
-			((EventAdmin) eventAdminTracker.getService()).sendEvent(mifareEvent);
+			Event mifareEvent;
+			try {
+				mifareEvent = new Event(MifareController.EVENT_TOPIC, properties);
+				((EventAdmin) eventAdminTracker.getService()).sendEvent(mifareEvent);
+			} catch (Exception e) {				
+				e.printStackTrace();
+			}
 			
 		}
 		

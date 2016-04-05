@@ -13,7 +13,7 @@ import no.ntnu.item.its.osgi.sensors.common.exceptions.SensorCommunicationExcept
 public interface MifareController {
 	
 	public static String CHARSET = "utf-8";
-	public static String EVENT_TOPIC = "/no/ntnu/item/its/osgi/sensors/mifare";
+	public static String EVENT_TOPIC = "no/ntnu/item/its/osgi/sensors/mifare";
 	public static String LOC_ID_KEY = "LOC_ID";
 
 	/*

@@ -9,7 +9,7 @@ import no.ntnu.item.its.osgi.sensors.common.exceptions.SensorCommunicationExcept
  */
 public interface ColorController {
 	
-	public static final String EVENT_TOPIC = "/no/ntnu/item/its/osgi/sensors/color";
+	public static final String EVENT_TOPIC = "no/ntnu/item/its/osgi/sensors/color";
 	public static final String COLOR_KEY = "COLOR";
 
 	/*

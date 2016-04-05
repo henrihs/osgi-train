@@ -54,12 +54,7 @@ public class Activator implements BundleActivator, SensorSchedulerService {
 
 	@Override
 	public boolean remove(Runnable r) {
+		// TODO Auto-generated method stub
 		return false;
-//		if (logRef != null) {
-//			context.getService(logRef).log(LogService.LOG_INFO, String.format("Removing runnable with hashCode %d", r.hashCode()));
-//		}
-//		
-//		return scheduler.;
 	}
-
 }

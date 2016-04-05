@@ -72,7 +72,6 @@ public class Activator implements BundleActivator {
 
 				if (rawColor != null) {
 					EColor color = colorApproximation(rawColor);
-					System.out.println("publish");
 					publish(color);
 				}
 			}

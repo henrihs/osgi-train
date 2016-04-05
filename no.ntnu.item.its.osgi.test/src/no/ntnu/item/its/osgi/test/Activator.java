@@ -11,6 +11,8 @@ import org.osgi.service.event.EventHandler;
 import org.osgi.service.log.LogEntry;
 import org.osgi.service.log.LogListener;
 import org.osgi.service.log.LogReaderService;
+import org.osgi.util.tracker.ServiceTracker;
+import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 import no.ntnu.item.its.osgi.sensors.common.interfaces.ColorController;
 import no.ntnu.item.its.osgi.sensors.common.interfaces.MifareController;
@@ -24,6 +26,7 @@ public class Activator implements BundleActivator, EventHandler, LogListener {
 	}
 
 	private String[] topics;
+	private ServiceTracker<LogReaderService, Object> readerTracker;
 
 	/*
 	 * (non-Javadoc)
@@ -40,12 +43,11 @@ public class Activator implements BundleActivator, EventHandler, LogListener {
 		serviceProps.put(EventConstants.EVENT_TOPIC, topics);
 		bundleContext.registerService(EventHandler.class.getName(), this, serviceProps);
 		
-		ServiceReference<LogReaderService> readerRef = (ServiceReference<LogReaderService>) 
-				context.getServiceReference(LogReaderService.class.getName());
-		if (readerRef != null) {
-			LogReaderService reader = (LogReaderService) context.getService(readerRef);
-			reader.addLogListener(this);
-		}
+		readerTracker = new ServiceTracker<LogReaderService, Object>(
+				bundleContext, 
+				LogReaderService.class,
+				new LogReaderTrackerCustomizer());
+		readerTracker.open();
 	}
 
 	/*
@@ -53,6 +55,7 @@ public class Activator implements BundleActivator, EventHandler, LogListener {
 	 * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext bundleContext) throws Exception {
+		readerTracker.close();
 		Activator.context = null;
 	}
 
@@ -66,6 +69,10 @@ public class Activator implements BundleActivator, EventHandler, LogListener {
 		}
 		
 	}
+	
+	public void listenTo(LogReaderService logReader) {
+		logReader.addLogListener(this);
+	}
 
 	@Override
 	public void logged(LogEntry arg0) {
@@ -76,5 +83,17 @@ public class Activator implements BundleActivator, EventHandler, LogListener {
 				arg0.getMessage()));				
 	}
 
+	private class LogReaderTrackerCustomizer implements ServiceTrackerCustomizer<LogReaderService, Object> {
+		@Override
+		public Object addingService(ServiceReference<LogReaderService> arg0) {
+			listenTo(context.getService(arg0));
+			return null;
+		}
+		@Override
+		public void modifiedService(ServiceReference<LogReaderService> arg0, Object arg1) {}
+		@Override
+		public void removedService(ServiceReference<LogReaderService> arg0, Object arg1) {}
+	}
 
 }
+
