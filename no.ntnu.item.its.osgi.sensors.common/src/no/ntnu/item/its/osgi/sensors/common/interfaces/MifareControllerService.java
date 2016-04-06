@@ -10,7 +10,7 @@ import no.ntnu.item.its.osgi.sensors.common.exceptions.SensorCommunicationExcept
  * 
  * The API encapsulates the inner workings of the reader/writer
  */
-public interface MifareController {
+public interface MifareControllerService {
 	
 	public static String CHARSET = "utf-8";
 	public static String EVENT_TOPIC = "no/ntnu/item/its/osgi/sensors/mifare";

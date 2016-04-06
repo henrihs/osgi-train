@@ -4,19 +4,17 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.function.Function;
 
 import javax.naming.SizeLimitExceededException;
 
 import no.ntnu.item.its.osgi.sensors.common.MifareKeyRing;
 import no.ntnu.item.its.osgi.sensors.common.exceptions.SensorCommunicationException;
 import no.ntnu.item.its.osgi.sensors.common.exceptions.SensorInitializationException;
-import no.ntnu.item.its.osgi.sensors.common.interfaces.MifareController;
+import no.ntnu.item.its.osgi.sensors.common.interfaces.MifareControllerService;
 
-public class MifareControllerImpl implements MifareController {
+public class MifareControllerImpl implements MifareControllerService {
 
 	private final IPN532 pn532;
-	private Function<String, Void> publishersCallback;
 
 	public MifareControllerImpl() throws SensorInitializationException, InterruptedException, IOException{
 		pn532 = PN532Factory.getInstance();
@@ -29,7 +27,7 @@ public class MifareControllerImpl implements MifareController {
 		}
 		
 		try {
-			byte[] byteContent = pad(content.getBytes(MifareController.CHARSET));
+			byte[] byteContent = pad(content.getBytes(MifareControllerService.CHARSET));
 			if (!pn532.writeMifareBlock(block, byteContent)) {
 				throw new SensorCommunicationException(String.format("Could not write data to block %d, check your connection", block));
 			}
