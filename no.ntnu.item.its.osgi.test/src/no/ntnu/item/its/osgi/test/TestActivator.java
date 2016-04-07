@@ -15,12 +15,15 @@ import org.osgi.service.log.LogReaderService;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
+import no.ntnu.item.its.osgi.sensors.accel.AccelerationControlerMocker;
+import no.ntnu.item.its.osgi.sensors.color.ColorControllerMocker;
 import no.ntnu.item.its.osgi.sensors.common.enums.SensorNature;
-import no.ntnu.item.its.osgi.sensors.common.interfaces.ColorController;
+import no.ntnu.item.its.osgi.sensors.common.interfaces.AccelerationControllerService;
+import no.ntnu.item.its.osgi.sensors.common.interfaces.ColorControllerService;
 import no.ntnu.item.its.osgi.sensors.common.interfaces.MifareControllerService;
 import no.ntnu.item.its.osgi.sensors.mifare.MifareControllerMocker;
 
-public class Activator implements BundleActivator, EventHandler, LogListener {
+public class TestActivator implements BundleActivator, EventHandler, LogListener {
 
 	private static BundleContext context;
 
@@ -35,13 +38,14 @@ public class Activator implements BundleActivator, EventHandler, LogListener {
 	 * (non-Javadoc)
 	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
 	 */
-	/* (non-Javadoc)
-	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
-	 */
 	public void start(BundleContext bundleContext) throws Exception {
-		Activator.context = bundleContext;
+		TestActivator.context = bundleContext;
 		
-		topics = new String[] { ColorController.EVENT_TOPIC, MifareControllerService.EVENT_TOPIC };
+		topics = new String[] { 
+				ColorControllerService.EVENT_TOPIC, 
+				MifareControllerService.EVENT_TOPIC,
+				AccelerationControllerService.EVENT_TOPIC
+				};
 		Hashtable<String, Object> serviceProps = new Hashtable<String, Object>();
 		serviceProps.put(EventConstants.EVENT_TOPIC, topics);
 		bundleContext.registerService(EventHandler.class.getName(), this, serviceProps);
@@ -53,6 +57,8 @@ public class Activator implements BundleActivator, EventHandler, LogListener {
 		readerTracker.open();
 		
 		registerMifareMocker();
+		registerColorMocker();
+		registerAccelMocker();
 	}
 
 	/*
@@ -61,24 +67,46 @@ public class Activator implements BundleActivator, EventHandler, LogListener {
 	 */
 	public void stop(BundleContext bundleContext) throws Exception {
 		readerTracker.close();
-		Activator.context = null;
+		TestActivator.context = null;
 	}
 	
 	private static void registerMifareMocker() {
-		MifareControllerService mcs = new MifareControllerMocker(); 
+		MifareControllerService mockedController = new MifareControllerMocker(); 
 		Hashtable<String, Object> props = new Hashtable<String, Object>(); 
 		props.put(SensorNature.PROPERTY_KEY, SensorNature.SIMULATED);
 		props.put(Constants.SERVICE_RANKING, SensorNature.SIMULATED.ordinal());
-		context.registerService(MifareControllerService.class, mcs, props);
+		context.registerService(MifareControllerService.class, mockedController, props);
+	}
+	
+	private static void registerColorMocker() {
+		ColorControllerService mockedController = new ColorControllerMocker(); 
+		Hashtable<String, Object> props = new Hashtable<String, Object>(); 
+		props.put(SensorNature.PROPERTY_KEY, SensorNature.SIMULATED);
+		props.put(Constants.SERVICE_RANKING, SensorNature.SIMULATED.ordinal());
+		context.registerService(ColorControllerService.class, mockedController, props);
+	}
+	
+	private static void registerAccelMocker() {
+		AccelerationControllerService mockedController = new AccelerationControlerMocker(); 
+		Hashtable<String, Object> props = new Hashtable<String, Object>(); 
+		props.put(SensorNature.PROPERTY_KEY, SensorNature.SIMULATED);
+		props.put(Constants.SERVICE_RANKING, SensorNature.SIMULATED.ordinal());
+		context.registerService(AccelerationControllerService.class, mockedController, props);
 	}
 
 	@Override
 	public void handleEvent(Event arg0) {
-		if (arg0.getTopic().equals(ColorController.EVENT_TOPIC)) {
-			System.out.println(arg0.getProperty(ColorController.COLOR_KEY));
+		if (arg0.getTopic().equals(ColorControllerService.EVENT_TOPIC)) {
+			System.out.println(ColorControllerService.COLOR_KEY + ": " + arg0.getProperty(ColorControllerService.COLOR_KEY));
 		} 
 		else if (arg0.getTopic().equals(MifareControllerService.EVENT_TOPIC)) {
-			System.out.println(arg0.getProperty(MifareControllerService.LOC_ID_KEY));
+			System.out.println(MifareControllerService.LOC_ID_KEY + ": " + arg0.getProperty(MifareControllerService.LOC_ID_KEY));
+		}
+		else if (arg0.getTopic().equals(AccelerationControllerService.EVENT_TOPIC)) {
+			System.out.println(
+					AccelerationControllerService.X_DATA_KEY + ": " + arg0.getProperty(AccelerationControllerService.X_DATA_KEY) + " " +
+					AccelerationControllerService.Y_DATA_KEY + ": " + arg0.getProperty(AccelerationControllerService.Y_DATA_KEY) + " " + 
+					AccelerationControllerService.Z_DATA_KEY + ": " + arg0.getProperty(AccelerationControllerService.Z_DATA_KEY));
 		}
 		
 	}

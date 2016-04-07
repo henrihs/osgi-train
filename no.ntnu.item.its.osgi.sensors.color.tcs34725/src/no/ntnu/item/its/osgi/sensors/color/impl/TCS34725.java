@@ -8,12 +8,12 @@ import com.pi4j.io.i2c.I2CFactory;
 
 import no.ntnu.item.its.osgi.sensors.common.exceptions.SensorCommunicationException;
 import no.ntnu.item.its.osgi.sensors.common.exceptions.SensorInitializationException;
-import no.ntnu.item.its.osgi.sensors.common.interfaces.ColorController;
+import no.ntnu.item.its.osgi.sensors.common.interfaces.ColorControllerService;
 
 /*
  * Light sensor
  */
-public class TCS34725 implements ColorController
+public class TCS34725 implements ColorControllerService
 {
 	private I2CBus bus;
 	private I2CDevice tcs34725;

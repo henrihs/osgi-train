@@ -12,7 +12,7 @@ import no.ntnu.item.its.osgi.sensors.common.enums.SensorNature;
 import no.ntnu.item.its.osgi.sensors.common.interfaces.MifareControllerService;
 import no.ntnu.item.its.osgi.sensors.mifare.pn532.MifareControllerImpl;
 
-public class Activator implements BundleActivator {
+public class MifareSensor implements BundleActivator {
 
 	private static BundleContext context;
 
@@ -22,7 +22,7 @@ public class Activator implements BundleActivator {
 
 	@Override
 	public void start(BundleContext bundleContext) throws Exception {
-		Activator.context = bundleContext;
+		MifareSensor.context = bundleContext;
 		ServiceReference<LogService> logRef = context.getServiceReference(LogService.class);
 		
 		try {
@@ -44,7 +44,7 @@ public class Activator implements BundleActivator {
 
 	@Override
 	public void stop(BundleContext arg0) throws Exception {
-		Activator.context = null;
+		MifareSensor.context = null;
 
 	}
 }

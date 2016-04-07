@@ -6,6 +6,7 @@ import java.util.function.Function;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
@@ -20,7 +21,7 @@ import no.ntnu.item.its.osgi.sensors.common.*;
 import no.ntnu.item.its.osgi.sensors.common.enums.*;
 import no.ntnu.item.its.osgi.sensors.common.exceptions.SensorCommunicationException;
 
-public class Activator implements BundleActivator {
+public class MifarePublisher implements BundleActivator {
 
 	public static final long SCHEDULE_PERIOD = 1000;
 
@@ -30,8 +31,7 @@ public class Activator implements BundleActivator {
 	private ServiceTracker<MifareControllerService, Object> mifareControllerTracker;
 
 	private Function<Void, Void> sensorReading; 
-	private Runnable runnableSensorReading;
-
+	
 	static BundleContext getContext() {
 		return context;
 	}
@@ -41,7 +41,7 @@ public class Activator implements BundleActivator {
 	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
 	 */
 	public void start(BundleContext bundleContext) throws Exception {
-		Activator.context = bundleContext;
+		MifarePublisher.context = bundleContext;
 
 		logServiceTracker = new ServiceTracker<>(bundleContext, LogService.class, null);
 		logServiceTracker.open();
@@ -50,46 +50,14 @@ public class Activator implements BundleActivator {
 		mifareControllerTracker = new ServiceTracker<>(
 				bundleContext, 
 				MifareControllerService.class, 
-				new MifareControllerTrackerCustomizer());
+				null);
 		mifareControllerTracker.open();
 
-		sensorReading = new Function<Void, Void>() {
-
-			@Override
-			public Void apply(Void t) {
-				String content; 
-				try {
-					content = ((MifareControllerService)mifareControllerTracker.getService())
-							.read(42, new MifareKeyRing(MifareKeyType.A));
-					if (!content.isEmpty()) {
-						publish(content);
-					}
-				} catch (SensorCommunicationException e) {
-				} catch (Exception e) {
-					((LogService)logServiceTracker.getService()).log(
-							LogService.LOG_ERROR, 
-							"Faulted while reading from sensor service", e);
-				}
-				
-				return t;
-			}
-		};
-
-		runnableSensorReading = new Runnable() {
-
+		sensorReading = getSensorReadingFunc();
+		Runnable runnableSensorReading = new Runnable() {
 			@Override
 			public void run() {
-				String content;
-				try {
-					content = ((MifareControllerService)mifareControllerTracker.getService())
-							.read(42, new MifareKeyRing(MifareKeyType.A));
-					if (!content.isEmpty()) {
-						publish(content);
-					}
-				} catch (SensorCommunicationException e) {
-					return;
-				}
-
+				sensorReading.apply(null);
 			}
 		};
 
@@ -108,13 +76,37 @@ public class Activator implements BundleActivator {
 	 * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext bundleContext) throws Exception {
-		runnableSensorReading = null;
-		//		SensorSchedulerService scheduler = bundleContext.getService(schedulerRef);
-		//		if (scheduler != null) {
-		//			scheduler.remove(runnableSensorReading);
-		//		}
+		sensorReading = null;
+		MifarePublisher.context = null;
+	}
+	
+	private Function<Void, Void> getSensorReadingFunc() {
+		return new Function<Void, Void>() {
 
-		Activator.context = null;
+			@Override
+			public Void apply(Void t) {
+				String content; 
+				try {
+					MifareControllerService s = (MifareControllerService)mifareControllerTracker.getService();
+					content = s.read(42, new MifareKeyRing(MifareKeyType.A));
+					if (!content.isEmpty()) {
+						publish(content);
+					}
+				} catch (SensorCommunicationException e) {
+				} catch (Exception e) {
+					((LogService)logServiceTracker.getService()).log(
+							LogService.LOG_ERROR, 
+							"Faulted while reading from sensor service", e);
+						try {
+							context.getBundle().stop();
+						} catch (BundleException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+				}
+				return t;
+			}
+		};
 	}
 
 	private void publish(String content){
@@ -125,7 +117,7 @@ public class Activator implements BundleActivator {
 			Event mifareEvent;
 			try {
 				mifareEvent = new Event(MifareControllerService.EVENT_TOPIC, properties);
-				((EventAdmin) eventAdminTracker.getService()).sendEvent(mifareEvent);
+				((EventAdmin) eventAdminTracker.getService()).postEvent(mifareEvent);
 			} catch (Exception e) {				
 				e.printStackTrace();
 			}
@@ -136,27 +128,4 @@ public class Activator implements BundleActivator {
 			((LogService) logServiceTracker.getService()).log(LogService.LOG_INFO, "Failed to publish event, no EventAdmin service available!");
 		}
 	}
-
-	private class MifareControllerTrackerCustomizer implements ServiceTrackerCustomizer<MifareControllerService, Object>{
-
-		@Override
-		public Object addingService(ServiceReference<MifareControllerService> arg0) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public void modifiedService(ServiceReference<MifareControllerService> arg0, Object arg1) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public void removedService(ServiceReference<MifareControllerService> arg0, Object arg1) {
-			// TODO Auto-generated method stub
-
-		}
-
-	}
-
 }

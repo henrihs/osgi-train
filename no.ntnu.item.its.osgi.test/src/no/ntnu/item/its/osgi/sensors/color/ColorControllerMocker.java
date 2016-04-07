@@ -1,10 +1,10 @@
 package no.ntnu.item.its.osgi.sensors.color;
 
 import no.ntnu.item.its.osgi.sensors.common.exceptions.SensorCommunicationException;
-import no.ntnu.item.its.osgi.sensors.common.interfaces.ColorController;
+import no.ntnu.item.its.osgi.sensors.common.interfaces.ColorControllerService;
 import no.ntnu.item.its.osgi.test.StatisticalGenerator;
 
-public class ColorControllerFactory implements ColorController {
+public class ColorControllerMocker implements ColorControllerService {
 	
 	public static int[][] colors = new int[][] {
 		{36, 7, 18, 11},
@@ -13,14 +13,10 @@ public class ColorControllerFactory implements ColorController {
 		{138, 59, 56, 25},
 		{22, 7, 8, 7}
 	};
-	
-	public static ColorController getInstance() {
-		return new ColorControllerFactory();
-	}
 
 	private StatisticalGenerator statistic;
 	
-	public ColorControllerFactory() {
+	public ColorControllerMocker() {
 		statistic = new StatisticalGenerator(0.1);
 	}
 

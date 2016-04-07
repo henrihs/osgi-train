@@ -11,7 +11,7 @@ import org.osgi.service.log.LogService;
 
 import no.ntnu.item.its.osgi.sensors.common.interfaces.SensorSchedulerService;
 
-public class Activator implements BundleActivator, SensorSchedulerService {
+public class SchedulerServiceImpl implements BundleActivator, SensorSchedulerService {
 
 	private static BundleContext context;
 
@@ -27,7 +27,7 @@ public class Activator implements BundleActivator, SensorSchedulerService {
 	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
 	 */
 	public void start(BundleContext bundleContext) throws Exception {
-		Activator.context = bundleContext;
+		SchedulerServiceImpl.context = bundleContext;
 		this.scheduler = Executors.newScheduledThreadPool(0); 
 		
 		logRef = bundleContext.getServiceReference(LogService.class);
@@ -40,7 +40,7 @@ public class Activator implements BundleActivator, SensorSchedulerService {
 	 */
 	public void stop(BundleContext bundleContext) throws Exception {
 		scheduler.shutdownNow();
-		Activator.context = null;
+		SchedulerServiceImpl.context = null;
 	}
 
 	@Override
