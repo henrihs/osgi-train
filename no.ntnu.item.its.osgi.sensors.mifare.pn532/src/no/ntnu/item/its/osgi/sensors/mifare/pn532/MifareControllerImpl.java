@@ -10,14 +10,20 @@ import javax.naming.SizeLimitExceededException;
 import no.ntnu.item.its.osgi.sensors.common.MifareKeyRing;
 import no.ntnu.item.its.osgi.sensors.common.exceptions.SensorCommunicationException;
 import no.ntnu.item.its.osgi.sensors.common.exceptions.SensorInitializationException;
-import no.ntnu.item.its.osgi.sensors.common.interfaces.MifareControllerService;
+import no.ntnu.item.its.osgi.sensors.mifare.MifareControllerService;
 
 public class MifareControllerImpl implements MifareControllerService {
 
 	private final IPN532 pn532;
+	private static final byte CARDBAUDRATE = 0x00;
 
 	public MifareControllerImpl() throws SensorInitializationException, InterruptedException, IOException{
 		pn532 = PN532Factory.getInstance();
+	}
+	
+	@Override
+	public long readTagUID() {
+		byte[] uid = readUid();
 	}
 		
 	@Override
@@ -88,6 +94,15 @@ public class MifareControllerImpl implements MifareControllerService {
 	}
 	
 	private boolean authenticate(int block, MifareKeyRing keyRing) throws SensorCommunicationException {
+		byte[] uid = readUid();
+		try {
+			return pn532.authenticateMifareBlock((byte)10, keyRing.type, keyRing.key, uid);
+		} catch (InterruptedException | IOException e) {
+			throw new SensorCommunicationException("Authentication error", e);
+		}		
+	}
+
+	private byte[] readUid() throws SensorCommunicationException {
 		byte[] uid = new byte[16];
 		int uidLen;
 		try {
@@ -99,11 +114,7 @@ public class MifareControllerImpl implements MifareControllerService {
 		}
 		
 		uid = Arrays.copyOf(uid, uidLen);
-		try {
-			return pn532.authenticateMifareBlock((byte)10, keyRing.type, keyRing.key, uid);
-		} catch (InterruptedException | IOException e) {
-			throw new SensorCommunicationException("Authentication error", e);
-		}		
+		return uid;
 	}
 
 }

@@ -9,7 +9,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogService;
 
 import no.ntnu.item.its.osgi.sensors.common.enums.SensorNature;
-import no.ntnu.item.its.osgi.sensors.common.interfaces.MifareControllerService;
+import no.ntnu.item.its.osgi.sensors.mifare.MifareControllerService;
 import no.ntnu.item.its.osgi.sensors.mifare.pn532.MifareControllerImpl;
 
 public class MifareSensor implements BundleActivator {
