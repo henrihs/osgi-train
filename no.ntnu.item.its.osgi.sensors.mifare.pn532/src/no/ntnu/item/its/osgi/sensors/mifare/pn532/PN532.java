@@ -3,8 +3,7 @@ package no.ntnu.item.its.osgi.sensors.mifare.pn532;
 import java.io.IOException;
 import java.util.Arrays;
 
-import no.ntnu.item.its.osgi.sensors.common.enums.MifareKeyType;
-import no.ntnu.item.its.osgi.sensors.common.enums.Status;
+import no.ntnu.item.its.osgi.sensors.mifare.MifareKeyType;
 
 public class PN532 implements IPN532 {
 
@@ -31,12 +30,6 @@ public class PN532 implements IPN532 {
 	public PN532(IPN532Interface medium) {
 		this.medium = medium;
 		this.pn532_packetbuffer = new byte[64];
-	}
-	
-	@Override
-	public Status getStatus() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	public void begin() throws IOException {

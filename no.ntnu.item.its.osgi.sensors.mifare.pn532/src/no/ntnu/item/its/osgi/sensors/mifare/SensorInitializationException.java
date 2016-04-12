@@ -1,4 +1,4 @@
-package no.ntnu.item.its.osgi.sensors.common.exceptions;
+package no.ntnu.item.its.osgi.sensors.mifare;
 
 public class SensorInitializationException extends Exception {
 

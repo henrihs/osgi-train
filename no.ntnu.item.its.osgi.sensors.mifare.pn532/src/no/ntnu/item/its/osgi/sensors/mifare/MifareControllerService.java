@@ -2,9 +2,6 @@ package no.ntnu.item.its.osgi.sensors.mifare;
 
 import javax.naming.SizeLimitExceededException;
 
-import no.ntnu.item.its.osgi.sensors.common.MifareKeyRing;
-import no.ntnu.item.its.osgi.sensors.common.exceptions.SensorCommunicationException;
-
 /*
  * This is the public API of a Mifare reader/writer unit
  * 

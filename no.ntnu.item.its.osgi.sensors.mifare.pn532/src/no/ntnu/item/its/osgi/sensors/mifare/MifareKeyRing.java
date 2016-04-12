@@ -1,8 +1,6 @@
-package no.ntnu.item.its.osgi.sensors.common;
+package no.ntnu.item.its.osgi.sensors.mifare;
 
 import java.util.Arrays;
-
-import no.ntnu.item.its.osgi.sensors.common.enums.MifareKeyType;
 
 public class MifareKeyRing {
 

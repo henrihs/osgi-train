@@ -1,4 +1,4 @@
-package no.ntnu.item.its.osgi.sensors.common.enums;
+package no.ntnu.item.its.osgi.sensors.mifare;
 
 public enum MifareKeyType {
 	/*
