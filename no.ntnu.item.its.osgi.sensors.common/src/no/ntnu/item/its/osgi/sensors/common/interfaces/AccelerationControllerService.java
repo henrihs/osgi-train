@@ -8,6 +8,8 @@ public interface AccelerationControllerService {
 	public static final String X_DATA_KEY = "data.x";
 	public static final String Y_DATA_KEY = "data.y";
 	public static final String Z_DATA_KEY = "data.z";
+	public static final String TIMESTAMP_KEY = "data.timestamp";
+	public static final double GRAVITATIONAL_RATIO = 9.81;
 
 	/*
 	 * Read raw acceleration data from sensor
