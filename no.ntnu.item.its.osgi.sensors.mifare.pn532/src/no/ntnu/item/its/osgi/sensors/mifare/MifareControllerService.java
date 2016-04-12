@@ -21,7 +21,7 @@ public interface MifareControllerService {
 	 * 
 	 * @returns the content from the block in question, represented as a String value
 	 */
-	public long readTagUID() throws SensorCommunicationException;
+	public String readTagUID() throws SensorCommunicationException;
 
 	/*
 	 * Write a block of data to a Mifare tag

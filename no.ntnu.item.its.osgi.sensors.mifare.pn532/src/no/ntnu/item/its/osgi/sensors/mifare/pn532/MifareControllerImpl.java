@@ -22,8 +22,25 @@ public class MifareControllerImpl implements MifareControllerService {
 	}
 	
 	@Override
-	public long readTagUID() {
+	public String readTagUID() throws SensorCommunicationException {
 		byte[] uid = readUid();
+		String strUid = "0x";
+		String s;
+		for (byte b : uid) {
+			if (b < 0) {
+				s = Integer.toHexString(b);
+				strUid += s.substring(s.length()-2); 
+			} else {
+				s = Integer.toHexString(b);
+				if (s.length() < 2) {
+					strUid += "0";
+				}
+				
+				strUid += s;				
+			}
+		}
+		
+		return strUid;
 	}
 		
 	@Override
@@ -106,7 +123,7 @@ public class MifareControllerImpl implements MifareControllerService {
 		byte[] uid = new byte[16];
 		int uidLen;
 		try {
-			uidLen = pn532.readPassiveTargetID((byte)0x00, uid);
+			uidLen = pn532.readPassiveTargetID(CARDBAUDRATE, uid);
 			if (uidLen <= 0)
 				throw new IOException();
 		} catch (InterruptedException | IOException e) {
