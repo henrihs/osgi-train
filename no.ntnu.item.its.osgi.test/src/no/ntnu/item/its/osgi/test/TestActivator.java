@@ -12,6 +12,7 @@ import org.osgi.service.event.EventHandler;
 import org.osgi.service.log.LogEntry;
 import org.osgi.service.log.LogListener;
 import org.osgi.service.log.LogReaderService;
+import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
@@ -117,9 +118,25 @@ public class TestActivator implements BundleActivator, EventHandler, LogListener
 
 	@Override
 	public void logged(LogEntry arg0) {
+		String level = null;
+		switch (arg0.getLevel()) {
+		case LogService.LOG_DEBUG:
+			level = "DEBUG";
+			break;
+		case LogService.LOG_INFO:
+			level = "INFO";
+			break;
+		case LogService.LOG_WARNING:
+			level = "WARNING";
+			break;
+		case LogService.LOG_ERROR:
+			level = "ERROR";
+			break;
+		}
+		
 		System.out.println(String.format(
-				"[%d]%s: %s",
-				arg0.getLevel(), 
+				"[%s]%s: %s",
+				level, 
 				arg0.getBundle(), 
 				arg0.getMessage()));				
 	}
