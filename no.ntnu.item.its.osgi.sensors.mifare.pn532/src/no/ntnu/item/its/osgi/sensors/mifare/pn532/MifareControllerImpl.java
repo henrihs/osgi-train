@@ -17,7 +17,7 @@ public class MifareControllerImpl implements MifareControllerService {
 	private final IPN532 pn532;
 	private static final byte CARDBAUDRATE = 0x00;
 
-	public MifareControllerImpl() throws SensorInitializationException, InterruptedException, IOException{
+	public MifareControllerImpl() throws SensorInitializationException {
 		pn532 = PN532Factory.getInstance();
 	}
 	
