@@ -20,4 +20,5 @@ public interface Logger {
 	public void trace(String s1);
 	public void trace(String s1, String s2);
 	public void trace(String s1, Throwable t);
+	public void trace(String s1, Object o);
 }
