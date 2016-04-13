@@ -63,14 +63,14 @@ public class PN532 {
 	}
 
 	public boolean SAMConfig() throws InterruptedException {
-		byte[] command = new byte[2];
+		byte[] command = new byte[4];
 		command[0] = PN532_COMMAND_SAMCONFIGURATION;
 		command[1] = 0x01; // normal mode;
-		// command[2] = 0x14; // timeout 50ms * 20 = 1 second
-		// command[3] = 0x01; // use IRQ pin!
+//		command[2] = 0x00; // timeout 50ms * 20 = 1 second
+//		command[3] = 0x01; // use IRQ pin!
 
 		if (medium.writeCommand(command) != CommandStatus.OK) {
-//			return false;
+			return false;
 		}
 
 		return medium.readResponse(pn532_packetbuffer, 8) > 0;
