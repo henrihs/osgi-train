@@ -16,6 +16,7 @@ import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
+import no.ntnu.item.its.osgi.publishers.speed.SpeedPublisher;
 import no.ntnu.item.its.osgi.sensors.accel.AccelerationControlerMocker;
 import no.ntnu.item.its.osgi.sensors.color.ColorControllerMocker;
 import no.ntnu.item.its.osgi.sensors.common.enums.SensorNature;
@@ -45,7 +46,8 @@ public class TestActivator implements BundleActivator, EventHandler, LogListener
 		topics = new String[] { 
 				ColorControllerService.EVENT_TOPIC, 
 				MifareControllerService.EVENT_TOPIC,
-				AccelerationControllerService.EVENT_TOPIC
+				AccelerationControllerService.EVENT_TOPIC,
+				SpeedPublisher.EVENT_TOPIC
 				};
 		Hashtable<String, Object> serviceProps = new Hashtable<String, Object>();
 		serviceProps.put(EventConstants.EVENT_TOPIC, topics);
@@ -108,6 +110,10 @@ public class TestActivator implements BundleActivator, EventHandler, LogListener
 					AccelerationControllerService.X_DATA_KEY + ": " + arg0.getProperty(AccelerationControllerService.X_DATA_KEY) + " " +
 					AccelerationControllerService.Y_DATA_KEY + ": " + arg0.getProperty(AccelerationControllerService.Y_DATA_KEY) + " " + 
 					AccelerationControllerService.Z_DATA_KEY + ": " + arg0.getProperty(AccelerationControllerService.Z_DATA_KEY));
+		}
+		else if (arg0.getTopic().equals(SpeedPublisher.EVENT_TOPIC)) {
+			System.out.println(
+					SpeedPublisher.VX_KEY + ": " + arg0.getProperty(SpeedPublisher.VX_KEY));
 		}
 		
 	}

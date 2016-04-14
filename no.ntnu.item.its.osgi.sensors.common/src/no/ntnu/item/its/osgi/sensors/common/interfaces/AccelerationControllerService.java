@@ -5,9 +5,9 @@ import no.ntnu.item.its.osgi.sensors.common.exceptions.SensorInitializationExcep
 
 public interface AccelerationControllerService {
 	public static final String EVENT_TOPIC = "no/ntnu/item/its/osgi/sensors/accel";
-	public static final String X_DATA_KEY = "data.x";
-	public static final String Y_DATA_KEY = "data.y";
-	public static final String Z_DATA_KEY = "data.z";
+	public static final String X_DATA_KEY = "accel.x";
+	public static final String Y_DATA_KEY = "accel.y";
+	public static final String Z_DATA_KEY = "accel.z";
 	public static final String TIMESTAMP_KEY = "data.timestamp";
 	public static final double GRAVITATIONAL_RATIO = 9.81;
 

@@ -14,8 +14,8 @@ public class SpeedPubActivator implements BundleActivator {
 		return context;
 	}
 
-	protected ServiceTracker<LogService, Object> logServiceTracker;
-	protected ServiceTracker<EventAdmin, Object> eventAdminTracker;
+	protected static ServiceTracker<LogService, Object> logServiceTracker;
+	protected static ServiceTracker<EventAdmin, Object> eventAdminTracker;
 	private SpeedPublisher publisher;
 
 	/*

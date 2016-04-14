@@ -3,17 +3,139 @@ package test;
 import java.io.UnsupportedEncodingException;
 import java.time.Clock;
 import java.util.ArrayList;
+import java.util.function.Function;
 
 import javax.naming.SizeLimitExceededException;
+
+import org.apache.commons.math.ConvergenceException;
+import org.apache.commons.math.FunctionEvaluationException;
+import org.apache.commons.math.MaxIterationsExceededException;
+import org.apache.commons.math.analysis.UnivariateRealFunction;
+import org.apache.commons.math.analysis.integration.LegendreGaussIntegrator;
+import org.apache.commons.math.analysis.integration.RombergIntegrator;
+import org.apache.commons.math.analysis.integration.SimpsonIntegrator;
+import org.apache.commons.math.analysis.integration.TrapezoidIntegrator;
+import org.apache.commons.math.analysis.integration.UnivariateRealIntegratorImpl;
+import org.w3c.dom.NamedNodeMap;
+
+//import no.ntnu.item.its.osgi.publishers.speed.SpeedPubActivator;
+//import no.ntnu.item.its.osgi.publishers.speed.SpeedPublisher.AccelExpression;
+//import no.ntnu.item.its.osgi.publishers.speed.SpeedPublisher.PreSpeedEvent;
 
 public class Main {
 	
 	public static void main(String[] args) {
-		for (int i = 0; i < 100; i++) {
-			System.out.println(i/20);
+//		PreSpeedEvent first = new PreSpeedEvent(0);
+//		first.setTimestamp(0);
+//		
+//		PreSpeedEvent second = new PreSpeedEvent(1);
+//		second.setTimestamp(10);
+//		second.calculateXVelocityDelta(first);
+//		
+//		PreSpeedEvent third = new PreSpeedEvent(0);
+//		third.setTimestamp(20);
+//		third.calculateXVelocityDelta(second);
+//		
+//		System.out.println(first);
+//		System.out.println(second);
+//		System.out.println(third);
+		
+		TrapezoidIntegrator trapezoid = new TrapezoidIntegrator();
+		measureIntegrationTime(trapezoid);
+		SimpsonIntegrator simpsons = new SimpsonIntegrator();
+		measureIntegrationTime(simpsons);
+		RombergIntegrator romberg = new RombergIntegrator();
+		measureIntegrationTime(romberg);
+	}
+
+
+
+	private static void measureIntegrationTime(UnivariateRealIntegratorImpl integrator) {
+		long s1 = System.nanoTime();
+		PreSpeedEvent[] events = new PreSpeedEvent[10000];
+		events[0] = new PreSpeedEvent(0, integrator);
+		for (int i = 1; i < events.length; i++) {
+			PreSpeedEvent event = new PreSpeedEvent(i, integrator);
+			event.calculateXVelocityDelta(events[i-1]);
+			events[i] = event;
+			try {
+				Thread.sleep(1);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		long s2 = System.nanoTime();
+		System.out.println(String.format("%s: %d", integrator.getClass().getSimpleName(), (s2-s1)/events.length-1000000));
+	}
+	
+	private static class PreSpeedEvent<T extends UnivariateRealIntegratorImpl> {
+		
+		private long timestamp;
+		private final double a_x;
+		private double v_x = 0;
+		private T integrator; 
+		
+		public PreSpeedEvent(double a_x, T integrator) {
+			timestamp = System.nanoTime();
+			this.a_x = a_x;
+			this.integrator = integrator;
 		}
 		
+		public long getTimestamp() {
+			return timestamp;
+		}
 		
+		public void setTimestamp(long t) {
+			timestamp = t;
+		}
+		
+		public void calculateXVelocityDelta(PreSpeedEvent priorEvent) {
+			double a_0 = priorEvent.a_x;
+			double a_1 = this.a_x;
+			long t_0 = priorEvent.getTimestamp();
+			long t_1 = getTimestamp();
+			
+			double v_0 = priorEvent.v_x;
+			Double v_delta = null;
+			
+			AccelExpression a = new AccelExpression(a_0, a_1, t_0, t_1);
+			try {
+				v_delta = integrator.integrate(a, t_0, t_1);
+			} catch (FunctionEvaluationException | IllegalArgumentException | ConvergenceException e) {
+				e.printStackTrace();
+			} 
+			
+			this.v_x = v_0 + v_delta;
+		}
+		
+		public String toString() {
+			return String.format("Time: %d, Acceleration: %f, Speed: %f", timestamp, a_x, v_x);
+		}
+	}
+	
+	private static class AccelExpression implements UnivariateRealFunction {
+	
+		private Function<Double, Double> accelAsFuncOfTime;
+		
+		public AccelExpression(double a_0, double a_1, long t_0, long t_1) {
+			accelAsFuncOfTime = getAccelAsFuncOfTime(a_0, a_1, t_0, t_1);
+		}
+		
+		@Override
+		public double value(double t) throws FunctionEvaluationException {
+			return accelAsFuncOfTime.apply(t);
+		}
+		
+		public Function<Double, Double> getAccelAsFuncOfTime(double a_0, double a_1, long t_0, long t_1) {
+			return new Function<Double, Double>() {
+				@Override
+				public Double apply(Double t) {
+					return a_0 + (a_1 - a_0) * ((t - t_0) / (t_1 - t_0));
+				}
+			};
+		}
+
 	}
 
 
