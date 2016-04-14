@@ -15,7 +15,7 @@ public class AccelerationControlerMocker implements AccelerationControllerServic
 
 	@Override
 	public int[] getRawData() throws SensorCommunicationException, SensorInitializationException {
-		return new int[] {statistic.newInt(), statistic.newInt(), statistic.newInt()};
+		return new int[] {statistic.newPolarInt(), statistic.newPolarInt(), statistic.newPolarInt()};
 	}
 
 	@Override

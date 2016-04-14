@@ -16,13 +16,14 @@ import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
-import no.ntnu.item.its.osgi.publishers.speed.SpeedPublisher;
+import no.ntnu.item.its.osgi.publishers.speed.VelocityPublisher;
 import no.ntnu.item.its.osgi.sensors.accel.AccelerationControlerMocker;
 import no.ntnu.item.its.osgi.sensors.color.ColorControllerMocker;
 import no.ntnu.item.its.osgi.sensors.common.enums.SensorNature;
 import no.ntnu.item.its.osgi.sensors.common.interfaces.AccelerationControllerService;
 import no.ntnu.item.its.osgi.sensors.common.interfaces.ColorControllerService;
 import no.ntnu.item.its.osgi.sensors.common.interfaces.MifareControllerService;
+import no.ntnu.item.its.osgi.sensors.common.interfaces.VelocityControllerService;
 import no.ntnu.item.its.osgi.sensors.mifare.MifareControllerMocker;
 
 public class TestActivator implements BundleActivator, EventHandler, LogListener {
@@ -47,7 +48,7 @@ public class TestActivator implements BundleActivator, EventHandler, LogListener
 				ColorControllerService.EVENT_TOPIC, 
 				MifareControllerService.EVENT_TOPIC,
 				AccelerationControllerService.EVENT_TOPIC,
-				SpeedPublisher.EVENT_TOPIC
+				VelocityControllerService.EVENT_TOPIC
 				};
 		Hashtable<String, Object> serviceProps = new Hashtable<String, Object>();
 		serviceProps.put(EventConstants.EVENT_TOPIC, topics);
@@ -111,9 +112,9 @@ public class TestActivator implements BundleActivator, EventHandler, LogListener
 					AccelerationControllerService.Y_DATA_KEY + ": " + arg0.getProperty(AccelerationControllerService.Y_DATA_KEY) + " " + 
 					AccelerationControllerService.Z_DATA_KEY + ": " + arg0.getProperty(AccelerationControllerService.Z_DATA_KEY));
 		}
-		else if (arg0.getTopic().equals(SpeedPublisher.EVENT_TOPIC)) {
+		else if (arg0.getTopic().equals(VelocityControllerService.EVENT_TOPIC)) {
 			System.out.println(
-					SpeedPublisher.VX_KEY + ": " + arg0.getProperty(SpeedPublisher.VX_KEY));
+					VelocityControllerService.VX_KEY + ": " + arg0.getProperty(VelocityControllerService.VX_KEY));
 		}
 		
 	}

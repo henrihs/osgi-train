@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>no.ntnu.item.its.osgi.publishers.speed</name>
+	<name>no.ntnu.item.its.osgi.publishers.accelBasedSpeed</name>
 	<comment></comment>
 	<projects>
 	</projects>

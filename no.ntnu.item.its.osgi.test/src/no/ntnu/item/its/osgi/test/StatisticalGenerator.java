@@ -38,4 +38,11 @@ public class StatisticalGenerator {
 		int randInt = r.nextInt(100);
 		return randInt;
 	}
+
+	public int newPolarInt() {
+		int polarity = 1;
+		if (r.nextBoolean())
+			polarity = -1;
+		return r.nextInt(2048) * polarity;
+	}
 }
