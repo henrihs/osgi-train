@@ -18,6 +18,9 @@ import org.apache.commons.math.analysis.integration.TrapezoidIntegrator;
 import org.apache.commons.math.analysis.integration.UnivariateRealIntegratorImpl;
 import org.w3c.dom.NamedNodeMap;
 
+import no.ntnu.item.its.osgi.publishers.speed.AccelFunction;
+import no.ntnu.item.its.osgi.publishers.speed.VelocityData;
+
 //import no.ntnu.item.its.osgi.publishers.speed.SpeedPubActivator;
 //import no.ntnu.item.its.osgi.publishers.speed.SpeedPublisher.AccelExpression;
 //import no.ntnu.item.its.osgi.publishers.speed.SpeedPublisher.PreSpeedEvent;
@@ -25,27 +28,44 @@ import org.w3c.dom.NamedNodeMap;
 public class Main {
 	
 	public static void main(String[] args) {
-//		PreSpeedEvent first = new PreSpeedEvent(0);
-//		first.setTimestamp(0);
-//		
-//		PreSpeedEvent second = new PreSpeedEvent(1);
-//		second.setTimestamp(10);
-//		second.calculateXVelocityDelta(first);
-//		
-//		PreSpeedEvent third = new PreSpeedEvent(0);
-//		third.setTimestamp(20);
-//		third.calculateXVelocityDelta(second);
-//		
-//		System.out.println(first);
-//		System.out.println(second);
-//		System.out.println(third);
 		
-		TrapezoidIntegrator trapezoid = new TrapezoidIntegrator();
-		measureIntegrationTime(trapezoid);
-		SimpsonIntegrator simpsons = new SimpsonIntegrator();
-		measureIntegrationTime(simpsons);
-		RombergIntegrator romberg = new RombergIntegrator();
-		measureIntegrationTime(romberg);
+		TrapezoidIntegrator integrator = new TrapezoidIntegrator();
+//		measureIntegrationTime(integrator);
+//		SimpsonIntegrator simpsons = new SimpsonIntegrator();
+//		measureIntegrationTime(simpsons);
+//		RombergIntegrator romberg = new RombergIntegrator();
+//		measureIntegrationTime(romberg);
+		
+		VelocityData<TrapezoidIntegrator> first = new VelocityData<TrapezoidIntegrator>(0, 0, integrator);
+		VelocityData<TrapezoidIntegrator> second = new VelocityData<TrapezoidIntegrator>(1, 10000000000L, integrator);
+		second.calculateVelocityDelta(first);
+		VelocityData<TrapezoidIntegrator> third = new VelocityData<TrapezoidIntegrator>(0, 20000000000L, integrator);
+		third.calculateVelocityDelta(second);
+		System.out.println(first);
+		System.out.println(second);
+		System.out.println(third);
+		
+//		AccelFunction accel = new AccelFunction(0, 1, 0, 1);
+//		AccelFunction brreak = new AccelFunction(1, 0, 1, 2);
+//		for (int i = 1; i < 11; i++) {
+//			try {
+//				System.out.println(accel.value(i*0.1));
+//			} catch (FunctionEvaluationException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
+//		
+//		for (int i = 1; i < 11; i++) {
+//			try {
+//				System.out.println(brreak.value(1+i*0.1));
+//			} catch (FunctionEvaluationException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
+		
+		
 	}
 
 

@@ -2,6 +2,7 @@ package no.ntnu.item.its.osgi.publishers.speed;
 
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Stack;
 
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
@@ -17,8 +18,10 @@ public class VelocityPublisher implements EventHandler {
 
 	private VelocityData<TrapezoidIntegrator> latestSpeedEvent;
 	private TrapezoidIntegrator integrator = new TrapezoidIntegrator();
+	private Stack<VelocityData<?>> accelDataStack;
 
 	public VelocityPublisher() {
+		accelDataStack = new Stack<>();
 		String[] topics = new String[] { AccelerationControllerService.EVENT_TOPIC };
 		Hashtable<String, Object> serviceProps = new Hashtable<String, Object>();
 		serviceProps.put(EventConstants.EVENT_TOPIC, topics);
@@ -34,8 +37,12 @@ public class VelocityPublisher implements EventHandler {
 			preSpeedEvent.calculateVelocityDelta(latestSpeedEvent);
 		}
 
-		publish(preSpeedEvent.v_x);
+		if (accelDataStack.size() > 30) {
+			publish(preSpeedEvent.v_x);
+			accelDataStack.clear();
+		}
 
+		accelDataStack.add(preSpeedEvent);
 		latestSpeedEvent = preSpeedEvent;
 	}
 

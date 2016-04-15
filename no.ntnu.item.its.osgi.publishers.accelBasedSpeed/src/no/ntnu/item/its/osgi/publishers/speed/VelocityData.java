@@ -13,7 +13,7 @@ public class VelocityData<T extends UnivariateRealIntegratorImpl> {
 	private T integrator; 
 
 	public VelocityData(double a_x, long timestamp, T integrator) {
-		this.timestamp = timestamp;
+		this.timestamp = timestamp/1000; // microsecond accuracy
 		this.a_x = a_x;
 		this.integrator = integrator;
 	}
@@ -25,8 +25,8 @@ public class VelocityData<T extends UnivariateRealIntegratorImpl> {
 	public void calculateVelocityDelta(VelocityData<?> priorEvent) {
 		double a_0 = priorEvent.a_x;
 		double a_1 = this.a_x;
-		double t_0 = priorEvent.getTimestamp()*10E-9;
-		double t_1 = getTimestamp()*10E-9;
+		double t_0 = priorEvent.getTimestamp()*1E-6; // second resolution (SU-unit)
+		double t_1 = getTimestamp()*1E-6; // second resolution (SU-unit)
 
 		double v_0 = priorEvent.v_x;
 		Double v_delta = null;
@@ -43,6 +43,6 @@ public class VelocityData<T extends UnivariateRealIntegratorImpl> {
 	}
 
 	public String toString() {
-		return String.format("Time: %d, Acceleration: %f, Speed: %f", timestamp, a_x, v_x);
+		return String.format("Time: %d ms, Acceleration: %f m/s^2, Speed: %f m/s", timestamp, a_x, v_x);
 	}
 }

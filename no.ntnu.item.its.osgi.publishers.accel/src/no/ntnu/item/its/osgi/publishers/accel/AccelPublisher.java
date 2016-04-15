@@ -18,7 +18,7 @@ import no.ntnu.item.its.osgi.sensors.common.servicetrackers.SchedulerTrackerCust
 
 public class AccelPublisher implements PublisherService {
 	
-	public static final long SCHEDULE_PERIOD = 1000;
+	public static final long SCHEDULE_PERIOD = 25;
 
 	private Function<Void, Void> sensorReading;
 

@@ -11,5 +11,6 @@
 			<accessrule ignoreifbetter="true" kind="nonaccessible" pattern="**/*"/>
 		</accessrules>
 	</classpathentry>
+	<classpathentry kind="src" path="/no.ntnu.item.its.osgi.publishers.accelBasedSpeed"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
