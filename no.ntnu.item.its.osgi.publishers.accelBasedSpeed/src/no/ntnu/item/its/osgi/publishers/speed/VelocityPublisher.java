@@ -43,7 +43,7 @@ public class VelocityPublisher implements EventHandler {
 				VelocityData<TrapezoidIntegrator> preSpeedEvent = new VelocityData<TrapezoidIntegrator>(a_x, timestamp, integrator);
 				if (previous != null) {
 					if (previous.getTimestamp() > preSpeedEvent.getTimestamp()) {
-						return; //Dont calculate speed if this event is too late
+						return; //Don't calculate speed if a newer event is already received
 					}
 					
 					preSpeedEvent.calculateVelocityDelta(previous);
