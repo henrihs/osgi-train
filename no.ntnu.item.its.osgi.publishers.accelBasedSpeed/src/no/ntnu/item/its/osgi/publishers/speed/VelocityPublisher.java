@@ -30,20 +30,27 @@ public class VelocityPublisher implements EventHandler {
 
 	@Override
 	public void handleEvent(Event arg0) {
-		double a_x = (double) arg0.getProperty(AccelerationControllerService.X_DATA_KEY);
-		long timestamp = (long) arg0.getProperty(AccelerationControllerService.TIMESTAMP_KEY);
-		VelocityData<TrapezoidIntegrator> preSpeedEvent = new VelocityData<TrapezoidIntegrator>(a_x, timestamp, integrator);
-		if (latestSpeedEvent != null) {
-			preSpeedEvent.calculateVelocityDelta(latestSpeedEvent);
-		}
-
-		if (accelDataStack.size() > 30) {
-			publish(preSpeedEvent.v_x);
-			accelDataStack.clear();
-		}
-
-		accelDataStack.add(preSpeedEvent);
-		latestSpeedEvent = preSpeedEvent;
+		Runnable r = new Runnable() {
+			
+			@Override
+			public void run() {
+				double a_x = (double) arg0.getProperty(AccelerationControllerService.X_DATA_KEY);
+				long timestamp = (long) arg0.getProperty(AccelerationControllerService.TIMESTAMP_KEY);
+				VelocityData<TrapezoidIntegrator> preSpeedEvent = new VelocityData<TrapezoidIntegrator>(a_x, timestamp, integrator);
+				if (latestSpeedEvent != null) {
+					preSpeedEvent.calculateVelocityDelta(latestSpeedEvent);
+				}
+				
+				if (accelDataStack.size() > 30) {
+					publish(preSpeedEvent.v_x);
+					accelDataStack.clear();
+				}
+				
+				accelDataStack.add(preSpeedEvent);
+				latestSpeedEvent = preSpeedEvent;
+			}
+		};
+		new Thread(r).start();
 	}
 
 	private void publish(double v_x) {
