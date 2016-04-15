@@ -19,23 +19,35 @@ public class AccelSensor implements BundleActivator {
 		return context;
 	}
 
+	private AccelerationControllerImpl acs;
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
 	 */
-	public void start(BundleContext bundleContext) throws Exception {
+	public void start(final BundleContext bundleContext) throws Exception {
 		AccelSensor.context = bundleContext;
-		ServiceReference<LogService> logRef = context.getServiceReference(LogService.class);
+		final ServiceReference<LogService> logRef = context.getServiceReference(LogService.class);
 		
-		try {
-			AccelerationControllerService acs = new AccelerationControllerImpl();
-			Hashtable<String, Object> props = new Hashtable<String, Object>(); 
-			props.put(SensorNature.PROPERTY_KEY, SensorNature.PHYSICAL);
-			props.put(org.osgi.framework.Constants.SERVICE_RANKING, SensorNature.PHYSICAL.ordinal());
-			bundleContext.registerService(AccelerationControllerService.class, acs, props);
-		} catch (Exception e) {
-			logAndStop(bundleContext, logRef, e);
-		}
+		Runnable r = new Runnable() {
+			public void run() {
+				try {
+					acs = new AccelerationControllerImpl();
+					Hashtable<String, Object> props = new Hashtable<String, Object>();
+					props.put(SensorNature.PROPERTY_KEY, SensorNature.PHYSICAL);
+					props.put(org.osgi.framework.Constants.SERVICE_RANKING, SensorNature.PHYSICAL.ordinal());
+					bundleContext.registerService(AccelerationControllerService.class, acs, props);
+				} catch (Exception e) {
+					try {
+						logAndStop(bundleContext, logRef, e);
+					} catch (Exception e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+			}
+		};
+		new Thread(r).start();
 		
 	}
 	
@@ -49,6 +61,7 @@ public class AccelSensor implements BundleActivator {
 	 * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext bundleContext) throws Exception {
+		acs.shutdown();
 		AccelSensor.context = null;
 	}
 

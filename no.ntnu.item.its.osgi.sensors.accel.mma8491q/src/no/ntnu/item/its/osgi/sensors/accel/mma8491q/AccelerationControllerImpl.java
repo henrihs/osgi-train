@@ -19,8 +19,8 @@ import no.ntnu.item.its.osgi.sensors.common.interfaces.AccelerationControllerSer
 
 public class AccelerationControllerImpl implements AccelerationControllerService {
 
-	private static Pin ENABLE_PIN_NO = RaspiPin.GPIO_00;
-	private static GpioController gpio = GpioFactory.getInstance();
+	private Pin ENABLE_PIN_NO = RaspiPin.GPIO_00;
+	private GpioController gpio = GpioFactory.getInstance();
 
 	private GpioPinDigitalOutput enablePin;
 	private I2CBus bus;
@@ -61,6 +61,12 @@ public class AccelerationControllerImpl implements AccelerationControllerService
 				set[2] - calibrationData[2]
 				};
 	} 
+	
+	public void shutdown() {
+		gpio.shutdown();
+		gpio.unprovisionPin(enablePin);
+		enablePin.clearProperties();
+	}
 
 	private void calibrate() throws SensorCommunicationException, SensorInitializationException {
 		int[][] calibrationRawData = new int[100][];
