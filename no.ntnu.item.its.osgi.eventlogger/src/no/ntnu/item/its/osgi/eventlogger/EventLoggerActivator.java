@@ -109,11 +109,16 @@ public class EventLoggerActivator implements BundleActivator, EventHandler, LogL
 			break;
 		}
 		
+		String content = arg0.getMessage();
+		if (arg0.getException() != null && arg0.getException().getCause() != null) {
+			content = content.concat(": ").concat(arg0.getException().getMessage());
+		}
+		
 		System.out.println(String.format(
 				"[%s]%s: %s",
 				level, 
-				arg0.getBundle(), 
-				arg0.getMessage()));				
+				arg0.getBundle(),
+				content));				
 	}
 
 	private class LogReaderTrackerCustomizer implements ServiceTrackerCustomizer<LogReaderService, Object> {

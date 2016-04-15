@@ -16,7 +16,6 @@ import no.ntnu.item.its.osgi.sensors.common.interfaces.VelocityControllerService
 
 public class VelocityPublisher implements EventHandler {
 
-	private VelocityData<TrapezoidIntegrator> latestSpeedEvent;
 	private TrapezoidIntegrator integrator = new TrapezoidIntegrator();
 	private Stack<VelocityData<?>> accelDataStack;
 
@@ -31,23 +30,32 @@ public class VelocityPublisher implements EventHandler {
 	@Override
 	public void handleEvent(Event arg0) {
 		Runnable r = new Runnable() {
-			
+
 			@Override
 			public void run() {
+				VelocityData<?> previous = null;
+				if (!accelDataStack.isEmpty()) {
+					previous = accelDataStack.peek();					
+				}
+				
 				double a_x = (double) arg0.getProperty(AccelerationControllerService.X_DATA_KEY);
 				long timestamp = (long) arg0.getProperty(AccelerationControllerService.TIMESTAMP_KEY);
 				VelocityData<TrapezoidIntegrator> preSpeedEvent = new VelocityData<TrapezoidIntegrator>(a_x, timestamp, integrator);
-				if (latestSpeedEvent != null) {
-					preSpeedEvent.calculateVelocityDelta(latestSpeedEvent);
+				if (previous != null) {
+					if (previous.getTimestamp() > preSpeedEvent.getTimestamp()) {
+						return; //Dont calculate speed if this event is too late
+					}
+					
+					preSpeedEvent.calculateVelocityDelta(previous);
 				}
-				
+
 				if (accelDataStack.size() > 30) {
-					publish(preSpeedEvent.v_x);
+					double delta_v_sum = accelDataStack.stream().mapToDouble(v -> v.v_delta).sum();
+					publish(delta_v_sum + preSpeedEvent.v_delta);
 					accelDataStack.clear();
 				}
-				
+
 				accelDataStack.add(preSpeedEvent);
-				latestSpeedEvent = preSpeedEvent;
 			}
 		};
 		new Thread(r).start();

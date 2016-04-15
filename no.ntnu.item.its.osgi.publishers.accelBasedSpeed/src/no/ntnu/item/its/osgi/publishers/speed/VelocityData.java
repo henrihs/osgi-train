@@ -9,7 +9,7 @@ public class VelocityData<T extends UnivariateRealIntegratorImpl> {
 
 	private long timestamp;
 	private final double a_x;
-	double v_x = 0;
+	double v_delta = 0;
 	private T integrator; 
 
 	public VelocityData(double a_x, long timestamp, T integrator) {
@@ -22,27 +22,23 @@ public class VelocityData<T extends UnivariateRealIntegratorImpl> {
 		return timestamp;
 	}
 
-	public void calculateVelocityDelta(VelocityData<?> priorEvent) {
+	public synchronized void calculateVelocityDelta(VelocityData<?> priorEvent) {
 		double a_0 = priorEvent.a_x;
 		double a_1 = this.a_x;
 		double t_0 = priorEvent.getTimestamp()*1E-6; // second resolution (SU-unit)
 		double t_1 = getTimestamp()*1E-6; // second resolution (SU-unit)
-
-		double v_0 = priorEvent.v_x;
-		Double v_delta = null;
 
 		AccelFunction a = new AccelFunction(a_0, a_1, t_0, t_1);
 		try {
 			v_delta = integrator.integrate(a, t_0, t_1);
 		} catch (FunctionEvaluationException | IllegalArgumentException | ConvergenceException e) {
 			((LogService)VelocityPubActivator.logServiceTracker.getService())
-			.log(LogService.LOG_ERROR, "Could not integrate acceleration expression", e);
+			.log(LogService.LOG_ERROR, "Could not integrate acceleration expression: ", e);
 		}
 
-		this.v_x = v_0 + v_delta;
 	}
 
 	public String toString() {
-		return String.format("Time: %d ms, Acceleration: %f m/s^2, Speed: %f m/s", timestamp, a_x, v_x);
+		return String.format("Time: %d ms, Acceleration: %f m/s^2, delta V: %f m/s", timestamp, a_x, v_delta);
 	}
 }
