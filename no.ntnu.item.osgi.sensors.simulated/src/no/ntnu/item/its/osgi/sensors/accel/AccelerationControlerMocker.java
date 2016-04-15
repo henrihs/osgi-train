@@ -3,7 +3,7 @@ package no.ntnu.item.its.osgi.sensors.accel;
 import no.ntnu.item.its.osgi.sensors.common.exceptions.SensorCommunicationException;
 import no.ntnu.item.its.osgi.sensors.common.exceptions.SensorInitializationException;
 import no.ntnu.item.its.osgi.sensors.common.interfaces.AccelerationControllerService;
-import no.ntnu.item.its.osgi.test.StatisticalGenerator;
+import no.ntnu.item.osgi.sensors.simulated.StatisticalGenerator;
 
 public class AccelerationControlerMocker implements AccelerationControllerService {
 	

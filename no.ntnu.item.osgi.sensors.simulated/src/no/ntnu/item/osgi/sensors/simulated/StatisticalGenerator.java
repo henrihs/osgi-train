@@ -1,4 +1,4 @@
-package no.ntnu.item.its.osgi.test;
+package no.ntnu.item.osgi.sensors.simulated;
 
 import java.util.Random;
 

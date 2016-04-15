@@ -5,7 +5,7 @@ import javax.naming.SizeLimitExceededException;
 import no.ntnu.item.its.osgi.sensors.common.MifareKeyRing;
 import no.ntnu.item.its.osgi.sensors.common.exceptions.SensorCommunicationException;
 import no.ntnu.item.its.osgi.sensors.common.interfaces.MifareControllerService;
-import no.ntnu.item.its.osgi.test.StatisticalGenerator;
+import no.ntnu.item.osgi.sensors.simulated.StatisticalGenerator;
 
 public class MifareControllerMocker implements MifareControllerService {
 

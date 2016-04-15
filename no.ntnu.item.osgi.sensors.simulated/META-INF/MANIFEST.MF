@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: SensorSimulation
+Bundle-SymbolicName: no.ntnu.item.osgi.sensors.simulated
+Bundle-Version: 1.0.0
+Bundle-Activator: no.ntnu.item.osgi.sensors.simulated.Activator
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Import-Package: no.ntnu.item.its.osgi.sensors.common,
+ no.ntnu.item.its.osgi.sensors.common.enums,
+ no.ntnu.item.its.osgi.sensors.common.exceptions,
+ no.ntnu.item.its.osgi.sensors.common.interfaces,
+ org.osgi.framework;version="1.3.0"
+Export-Package: no.ntnu.item.its.osgi.sensors.accel;uses:="no.ntnu.item.its.osgi.sensors.common.interfaces",
+ no.ntnu.item.its.osgi.sensors.color;uses:="no.ntnu.item.its.osgi.sensors.common.interfaces",
+ no.ntnu.item.its.osgi.sensors.mifare;uses:="no.ntnu.item.its.osgi.sensors.common,no.ntnu.item.its.osgi.sensors.common.interfaces";version="1.0.0"
