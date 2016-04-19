@@ -33,12 +33,6 @@ public class PN532 implements IPN532 {
 		this.pn532_packetbuffer = new byte[64];
 	}
 	
-	@Override
-	public Status getStatus() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	public void begin() throws IOException {
 		medium.begin();
 		medium.wakeup();

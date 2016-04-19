@@ -1,5 +1,7 @@
 package no.ntnu.item.its.osgi.publishers.speed;
 
+import java.util.ArrayList;
+import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Stack;
@@ -11,20 +13,28 @@ import org.osgi.service.event.EventHandler;
 import org.osgi.service.log.LogService;
 import org.apache.commons.math.analysis.integration.*;
 
+import no.ntnu.item.its.osgi.sensors.common.enums.PublisherType;
+import no.ntnu.item.its.osgi.sensors.common.enums.Status;
 import no.ntnu.item.its.osgi.sensors.common.interfaces.AccelerationControllerService;
+import no.ntnu.item.its.osgi.sensors.common.interfaces.PublisherService;
 import no.ntnu.item.its.osgi.sensors.common.interfaces.VelocityControllerService;
 
-public class VelocityPublisher implements EventHandler {
+public class VelocityPublisher implements EventHandler, PublisherService {
 
 	private TrapezoidIntegrator integrator = new TrapezoidIntegrator();
-	private Stack<VelocityData<?>> accelDataStack;
+	private ArrayList<VelocityData<?>> accelDataCollection;
+	private static final PublisherType TYPE = PublisherType.VELOCITY;
 
 	public VelocityPublisher() {
-		accelDataStack = new Stack<>();
+		accelDataCollection = new ArrayList<>();
 		String[] topics = new String[] { AccelerationControllerService.EVENT_TOPIC };
-		Hashtable<String, Object> serviceProps = new Hashtable<String, Object>();
-		serviceProps.put(EventConstants.EVENT_TOPIC, topics);
-		VelocityPubActivator.getContext().registerService(EventHandler.class.getName(), this, serviceProps);
+		Hashtable<String, Object> handlerServiceProps = new Hashtable<String, Object>();
+		handlerServiceProps.put(EventConstants.EVENT_TOPIC, topics);
+		VelocityPubActivator.getContext().registerService(EventHandler.class.getName(), this, handlerServiceProps);
+		
+		Dictionary<String, Object> publiserServiceProps = new Hashtable<String, Object>();
+		publiserServiceProps.put(PublisherType.class.getSimpleName(), TYPE);
+		VelocityPubActivator.getContext().registerService(PublisherService.class, this, publiserServiceProps);
 	}
 
 	@Override
@@ -34,8 +44,8 @@ public class VelocityPublisher implements EventHandler {
 			@Override
 			public void run() {
 				VelocityData<?> previous = null;
-				if (!accelDataStack.isEmpty()) {
-					previous = accelDataStack.peek();					
+				if (!accelDataCollection.isEmpty()) {
+					previous = accelDataCollection.get(accelDataCollection.size()-1);					
 				}
 				
 				double a_x = (double) arg0.getProperty(AccelerationControllerService.X_DATA_KEY);
@@ -49,13 +59,20 @@ public class VelocityPublisher implements EventHandler {
 					preSpeedEvent.calculateVelocityDelta(previous);
 				}
 
-				if (accelDataStack.size() > 30) {
-					double delta_v_sum = accelDataStack.stream().mapToDouble(v -> v.v_delta).sum();
+				if (accelDataCollection.size() > 30) {
+					double delta_v_sum = 0;
+					
+					try {
+						delta_v_sum = accelDataCollection.stream().mapToDouble(v -> v.v_delta).sum();
+					} catch (NullPointerException e) {
+						e.printStackTrace();
+					}
+					
 					publish(delta_v_sum + preSpeedEvent.v_delta);
-					accelDataStack.clear();
+					accelDataCollection.clear();
 				}
 
-				accelDataStack.add(preSpeedEvent);
+				accelDataCollection.add(preSpeedEvent);
 			}
 		};
 		new Thread(r).start();
@@ -82,5 +99,16 @@ public class VelocityPublisher implements EventHandler {
 		properties.put(VelocityControllerService.VX_KEY, v_x);
 		Event speedEvent = new Event(VelocityControllerService.EVENT_TOPIC, properties);
 		return speedEvent;
+	}
+
+	@Override
+	public Status getStatus() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public PublisherType getType() {
+		return TYPE ;
 	}
 }

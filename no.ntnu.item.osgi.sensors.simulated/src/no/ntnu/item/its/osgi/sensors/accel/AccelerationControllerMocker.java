@@ -32,18 +32,19 @@ public class AccelerationControllerMocker implements AccelerationControllerServi
 
 	@Override
 	public int[] getRawData() throws SensorCommunicationException, SensorInitializationException {
-		return new int[] {statistic.newPolarInt(), statistic.newPolarInt(), statistic.newPolarInt()};
+//		return new int[] {statistic.newPolarInt(), statistic.newPolarInt(), statistic.newPolarInt()};
+		return new int[] {getInt(), getInt(), getInt()};
 	}
 
 	@Override
 	public int[] getCalibratedData() throws SensorCommunicationException, SensorInitializationException {
 		return getRawData();
 	}
-
-	private double getNextSin() {
-		Sin s = org.apache.commons.math.analysis.function.Sin; 
+		
+	public int getInt() {
+		return (int) Double.doubleToLongBits(getIterator().next()*1024);
 	}
-	
+
 	private Iterator<Double> getIterator() {
 		if (decimalIterator == null || !decimalIterator.hasNext()) {
 			decimalIterator = decimals.iterator();

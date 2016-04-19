@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: MifarePublisher
 Bundle-SymbolicName: no.ntnu.item.its.osgi.publishers.mifare
 Bundle-Version: 1.0.0
-Bundle-Activator: no.ntnu.item.its.osgi.publishers.mifare.MifarePublisher
+Bundle-Activator: no.ntnu.item.its.osgi.publishers.mifare.MifarePubActivator
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: no.ntnu.item.its.osgi.sensors.common,
  no.ntnu.item.its.osgi.sensors.common.enums,

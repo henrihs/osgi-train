@@ -9,9 +9,7 @@ Import-Package: no.ntnu.item.its.osgi.sensors.common,
  no.ntnu.item.its.osgi.sensors.common.enums,
  no.ntnu.item.its.osgi.sensors.common.exceptions,
  no.ntnu.item.its.osgi.sensors.common.interfaces,
- org.osgi.framework;version="1.3.0",
- org.apache.commons.math.analysis.function;version="2.1.0"
+ org.osgi.framework;version="1.3.0"
 Export-Package: no.ntnu.item.its.osgi.sensors.accel;uses:="no.ntnu.item.its.osgi.sensors.common.interfaces",
  no.ntnu.item.its.osgi.sensors.color;uses:="no.ntnu.item.its.osgi.sensors.common.interfaces",
  no.ntnu.item.its.osgi.sensors.mifare;uses:="no.ntnu.item.its.osgi.sensors.common,no.ntnu.item.its.osgi.sensors.common.interfaces";version="1.0.0"
-Require-Bundle: org.apache.commons.math

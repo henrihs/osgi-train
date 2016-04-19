@@ -8,7 +8,7 @@ import no.ntnu.item.its.osgi.sensors.common.interfaces.PublisherService;
 /*
  * This interface represents a PN532 RFID/NFC card for the Raspberry Pi
  */
-public interface IPN532 extends PublisherService {
+public interface IPN532 {
 
 	
 	/*

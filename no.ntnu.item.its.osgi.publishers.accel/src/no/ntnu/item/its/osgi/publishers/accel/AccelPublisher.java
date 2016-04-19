@@ -1,5 +1,6 @@
 package no.ntnu.item.its.osgi.publishers.accel;
 
+import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.function.Function;
@@ -10,6 +11,7 @@ import org.osgi.service.event.EventAdmin;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
+import no.ntnu.item.its.osgi.sensors.common.enums.PublisherType;
 import no.ntnu.item.its.osgi.sensors.common.enums.Status;
 import no.ntnu.item.its.osgi.sensors.common.interfaces.AccelerationControllerService;
 import no.ntnu.item.its.osgi.sensors.common.interfaces.PublisherService;
@@ -19,8 +21,10 @@ import no.ntnu.item.its.osgi.sensors.common.servicetrackers.SchedulerTrackerCust
 public class AccelPublisher implements PublisherService {
 	
 	public static final long SCHEDULE_PERIOD = 25;
+	private static final PublisherType TYPE = PublisherType.ACCEL;
 
 	private Function<Void, Void> sensorReading;
+
 
 	public AccelPublisher() {		
 		sensorReading = getSensorReadingFunc();
@@ -41,6 +45,10 @@ public class AccelPublisher implements PublisherService {
 								runnableSensorReading, 
 								SCHEDULE_PERIOD));
 		schedulerTracker.open();
+		
+		Dictionary<String, Object> publiserServiceProps = new Hashtable<String, Object>();
+		publiserServiceProps.put(PublisherType.class.getSimpleName(), TYPE);
+		AccelPubActivator.getContext().registerService(PublisherService.class, this, publiserServiceProps);
 	}
 	
 	protected void stop() {
@@ -51,6 +59,11 @@ public class AccelPublisher implements PublisherService {
 	public Status getStatus() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	@Override
+	public PublisherType getType() {
+		return TYPE;
 	}
 	
 	private Function<Void, Void> getSensorReadingFunc() {
