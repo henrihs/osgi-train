@@ -1,5 +1,6 @@
 package no.ntnu.item.its.osgi.eventlogger;
 
+import java.io.PrintWriter;
 import java.util.Hashtable;
 
 import org.osgi.framework.BundleActivator;
@@ -30,6 +31,8 @@ public class EventLoggerActivator implements BundleActivator, EventHandler, LogL
 
 	private String[] topics;
 	private ServiceTracker<LogReaderService, Object> readerTracker;
+	private PrintWriter accelWriter;
+	private PrintWriter velocityWriter;
 
 	/*
 	 * (non-Javadoc)
@@ -41,7 +44,7 @@ public class EventLoggerActivator implements BundleActivator, EventHandler, LogL
 		topics = new String[] { 
 				ColorControllerService.EVENT_TOPIC, 
 				MifareControllerService.EVENT_TOPIC,
-//				AccelerationControllerService.EVENT_TOPIC,
+				AccelerationControllerService.EVENT_TOPIC,
 				VelocityControllerService.EVENT_TOPIC
 				};
 		Hashtable<String, Object> serviceProps = new Hashtable<String, Object>();
@@ -53,6 +56,9 @@ public class EventLoggerActivator implements BundleActivator, EventHandler, LogL
 				LogReaderService.class,
 				new LogReaderTrackerCustomizer());
 		readerTracker.open();
+		
+		accelWriter = new PrintWriter("x_axis_acceleration_log.csv", "UTF-8");
+		velocityWriter = new PrintWriter("x_axis_velocity_log.csv", "UTF-8");
 	}
 
 	/*
@@ -61,6 +67,8 @@ public class EventLoggerActivator implements BundleActivator, EventHandler, LogL
 	 */
 	public void stop(BundleContext bundleContext) throws Exception {
 		readerTracker.close();
+		accelWriter.close();
+		velocityWriter.close();
 		EventLoggerActivator.context = null;
 	}
 	
@@ -74,15 +82,15 @@ public class EventLoggerActivator implements BundleActivator, EventHandler, LogL
 		else if (arg0.getTopic().equals(MifareControllerService.EVENT_TOPIC)) {
 			System.out.println(MifareControllerService.LOC_ID_KEY + ": " + arg0.getProperty(MifareControllerService.LOC_ID_KEY));
 		}
-//		else if (arg0.getTopic().equals(AccelerationControllerService.EVENT_TOPIC)) {
-//			System.out.println(
-//					AccelerationControllerService.X_DATA_KEY + ": " + arg0.getProperty(AccelerationControllerService.X_DATA_KEY) + " " +
-//					AccelerationControllerService.Y_DATA_KEY + ": " + arg0.getProperty(AccelerationControllerService.Y_DATA_KEY) + " " + 
-//					AccelerationControllerService.Z_DATA_KEY + ": " + arg0.getProperty(AccelerationControllerService.Z_DATA_KEY));
-//		}
+		else if (arg0.getTopic().equals(AccelerationControllerService.EVENT_TOPIC)) {
+			accelWriter.println(
+					arg0.getProperty(AccelerationControllerService.TIMESTAMP_KEY) + ", " +
+					arg0.getProperty(AccelerationControllerService.X_DATA_KEY));
+		}
 		else if (arg0.getTopic().equals(VelocityControllerService.EVENT_TOPIC)) {
-			System.out.println(
-					VelocityControllerService.VX_KEY + ": " + arg0.getProperty(VelocityControllerService.VX_KEY));
+			velocityWriter.println(
+					arg0.getProperty(VelocityControllerService.TIMESTAMP_KEY) + ", " +
+					arg0.getProperty(VelocityControllerService.VX_KEY));
 		}
 		
 	}

@@ -20,7 +20,7 @@ import no.ntnu.item.its.osgi.sensors.common.servicetrackers.SchedulerTrackerCust
 
 public class AccelPublisher implements PublisherService {
 	
-	public static final long SCHEDULE_PERIOD = 25;
+	public static final long SCHEDULE_PERIOD = 20;
 	private static final PublisherType TYPE = PublisherType.ACCEL;
 
 	private Function<Void, Void> sensorReading;
@@ -96,7 +96,7 @@ public class AccelPublisher implements PublisherService {
 	private void publish(int[] accelData) {
 		if (!AccelPubActivator.eventAdminTracker.isEmpty()) {
 			Event accelEvent = createEvent(accelData);			
-			((EventAdmin) AccelPubActivator.eventAdminTracker.getService()).postEvent(accelEvent);
+			((EventAdmin) AccelPubActivator.eventAdminTracker.getService()).sendEvent(accelEvent);
 		}
 		
 		else if (!AccelPubActivator.logServiceTracker.isEmpty()) {

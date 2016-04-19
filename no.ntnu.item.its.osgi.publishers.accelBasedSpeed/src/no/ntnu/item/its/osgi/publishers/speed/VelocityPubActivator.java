@@ -38,6 +38,7 @@ public class VelocityPubActivator implements BundleActivator {
 	 * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext bundleContext) throws Exception {
+		publisher.stop();
 		VelocityPubActivator.context = null;
 	}
 

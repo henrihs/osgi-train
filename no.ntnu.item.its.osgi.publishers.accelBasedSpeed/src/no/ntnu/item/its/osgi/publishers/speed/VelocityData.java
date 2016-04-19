@@ -5,7 +5,7 @@ import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.analysis.integration.UnivariateRealIntegratorImpl;
 import org.osgi.service.log.LogService;
 
-public class VelocityData<T extends UnivariateRealIntegratorImpl> {
+public class VelocityData<T extends UnivariateRealIntegratorImpl> implements Comparable<VelocityData<?>> {
 
 	private long timestamp;
 	private final double a_x;
@@ -40,5 +40,10 @@ public class VelocityData<T extends UnivariateRealIntegratorImpl> {
 
 	public String toString() {
 		return String.format("Time: %d ms, Acceleration: %f m/s^2, delta V: %f m/s", timestamp, a_x, v_delta);
+	}
+
+	@Override
+	public int compareTo(VelocityData<?> o) {
+		return Double.compare(this.timestamp, o.timestamp);
 	}
 }
