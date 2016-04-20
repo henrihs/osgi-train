@@ -33,7 +33,8 @@ public class AccelerationControllerMocker implements AccelerationControllerServi
 	@Override
 	public int[] getRawData() throws SensorCommunicationException, SensorInitializationException {
 //		return new int[] {statistic.newPolarInt(), statistic.newPolarInt(), statistic.newPolarInt()};
-		return new int[] {getInt(), getInt(), getInt()};
+		int i = getInt();
+		return new int[] {i,i,i};
 	}
 
 	@Override
@@ -42,7 +43,8 @@ public class AccelerationControllerMocker implements AccelerationControllerServi
 	}
 		
 	public int getInt() {
-		return (int) Double.doubleToLongBits(getIterator().next()*1024);
+		Double d = getIterator().next()*1024;
+		return d.intValue();
 	}
 
 	private Iterator<Double> getIterator() {
