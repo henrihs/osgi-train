@@ -12,21 +12,34 @@ import no.ntnu.item.osgi.sensors.simulated.StatisticalGenerator;
 
 public class AccelerationControllerMocker implements AccelerationControllerService {
 	
-	private StatisticalGenerator statistic;
 	private final ArrayList<Double> decimals; 
 	private Iterator<Double> decimalIterator;
 
 	public AccelerationControllerMocker() {
-		statistic = new StatisticalGenerator(0.1);
 		decimals = new ArrayList<>();
-		for (double i = -1.0; i < 1; i+=0.001) {
+		for (double i = 0.0; i < 1.0; i+=0.01) {
 			decimals.add(i);
 		}
 		
-		ArrayList<Double> reverseDecimals = (ArrayList<Double>) decimals.clone();
-		Comparator<Double> comparator = Collections.reverseOrder();
-		Collections.sort(reverseDecimals,comparator);
-		decimals.addAll(reverseDecimals);
+		for (double i = 1.0; i > 0.0; i-=0.01) {
+			decimals.add(i);
+		}
+		
+		for (int i = 0; i < 100; i++) {
+			decimals.add(0.0);
+		}
+		
+		for (double i = 0.0; i > -1.0; i-=0.01) {
+			decimals.add(i);
+		}
+		
+		for (double i = -1.0; i < 0.0; i+=0.01) {
+			decimals.add(i);
+		}
+
+		for (int i = 0; i < 100; i++) {
+			decimals.add(0.0);
+		}
 	}
 	
 
@@ -43,7 +56,7 @@ public class AccelerationControllerMocker implements AccelerationControllerServi
 	}
 		
 	public int getInt() {
-		Double d = getIterator().next()*1024;
+		Double d = getIterator().next()*1024/9.81;
 		return d.intValue();
 	}
 

@@ -26,7 +26,7 @@ import no.ntnu.item.its.osgi.sensors.common.servicetrackers.SchedulerTrackerCust
 
 public class VelocityPublisher implements EventHandler, PublisherService {
 
-	public static final long SCHEDULE_PERIOD = 50;
+	public static final long SCHEDULE_PERIOD = 10;
 
 	private TrapezoidIntegrator integrator = new TrapezoidIntegrator();
 	private volatile ConcurrentSkipListSet<VelocityData<?>> accelDataCollection;
