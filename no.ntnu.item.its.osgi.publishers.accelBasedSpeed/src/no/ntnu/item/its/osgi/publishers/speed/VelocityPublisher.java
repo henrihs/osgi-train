@@ -26,12 +26,12 @@ import no.ntnu.item.its.osgi.sensors.common.servicetrackers.SchedulerTrackerCust
 
 public class VelocityPublisher implements EventHandler, PublisherService {
 
-	public static final long SCHEDULE_PERIOD = 10;
+	//	public static final long SCHEDULE_PERIOD = 10;
 
 	private TrapezoidIntegrator integrator = new TrapezoidIntegrator();
 	private volatile ConcurrentSkipListSet<VelocityData<?>> accelDataCollection;
 	private static final PublisherType TYPE = PublisherType.VELOCITY;
-	private Function<Void, Void> speedAddingFunc;
+	VelocityData<?> previous;
 	private double velocity;
 
 	public VelocityPublisher() {
@@ -46,23 +46,23 @@ public class VelocityPublisher implements EventHandler, PublisherService {
 		VelocityPubActivator.getContext().registerService(PublisherService.class, this, publiserServiceProps);
 		velocity = 0;
 
-		speedAddingFunc = getSpeedAddingFunc();
-		Runnable runnableSpeedAdding = new Runnable() {
-			@Override
-			public void run() {
-				speedAddingFunc.apply(null);
-			}
-		};
+		//		speedAddingFunc = getSpeedAddingFunc();
+		//		Runnable runnableSpeedAdding = new Runnable() {
+		//			@Override
+		//			public void run() {
+		//				speedAddingFunc.apply(null);
+		//			}
+		//		};
 
-		ServiceTracker<SensorSchedulerService, Object> schedulerTracker = 
-				new ServiceTracker<SensorSchedulerService, Object>(
-						VelocityPubActivator.getContext(), 
-						SensorSchedulerService.class, 
-						new SchedulerTrackerCustomizer(
-								VelocityPubActivator.getContext(), 
-								runnableSpeedAdding, 
-								SCHEDULE_PERIOD));
-		schedulerTracker.open();
+		//		ServiceTracker<SensorSchedulerService, Object> schedulerTracker = 
+		//				new ServiceTracker<SensorSchedulerService, Object>(
+		//						VelocityPubActivator.getContext(), 
+		//						SensorSchedulerService.class, 
+		//						new SchedulerTrackerCustomizer(
+		//								VelocityPubActivator.getContext(), 
+		//								runnableSpeedAdding, 
+		//								SCHEDULE_PERIOD));
+		//		schedulerTracker.open();
 	}
 
 	@Override
@@ -70,63 +70,67 @@ public class VelocityPublisher implements EventHandler, PublisherService {
 
 		Runnable r = new Runnable() {
 			public void run() {
-				VelocityData<?> previous = null;
-				if (!accelDataCollection.isEmpty()) {
-					try {
-						previous = accelDataCollection.last();
-					} catch (NoSuchElementException e) {
-						previous = null;
-					}
-				}
-				
+				//				VelocityData<?> previous = null;
+				//				if (!accelDataCollection.isEmpty()) {
+				//					try {
+				//						previous = accelDataCollection.last();
+				//					} catch (NoSuchElementException e) {
+				//						previous = null;
+				//					}
+				//				}
 				double a_x = (double) arg0.getProperty(AccelerationControllerService.X_DATA_KEY);
 				long timestamp = (long) arg0.getProperty(AccelerationControllerService.TIMESTAMP_KEY);
 				VelocityData<TrapezoidIntegrator> preSpeedEvent = new VelocityData<TrapezoidIntegrator>(a_x, timestamp,
 						integrator);
 				if (previous != null) {
-					if (previous.getTimestamp() > preSpeedEvent.getTimestamp()) {
-						return; //Don't calculate speed if a newer event is already received
-					}
+					synchronized (previous) {
+						if (previous.getTimestamp() > preSpeedEvent.getTimestamp()) {
+							return; //Don't calculate speed if a newer event is already received
+						}
 
-					preSpeedEvent.calculateVelocityDelta(previous);
+						preSpeedEvent.calculateVelocityDelta(previous);
+					}
 				}
-				accelDataCollection.add(preSpeedEvent);
+				//				accelDataCollection.add(preSpeedEvent);
+				velocity += preSpeedEvent.v_delta;
+				publish(velocity);
+				previous = preSpeedEvent;					
 			}
 		};
-		
+
 		new Thread(r).start();
 	}
 
-	private Function<Void, Void> getSpeedAddingFunc() {
-		return new Function<Void, Void>() {
-
-			@Override
-			public Void apply(Void t) {
-				if (accelDataCollection.size() < 5) {
-					return null;
-				}
-				
-				SortedSet<VelocityData<?>> data = null;
-				synchronized (accelDataCollection) {
-					data = (ConcurrentSkipListSet<VelocityData<?>>) accelDataCollection.clone();
-					accelDataCollection.clear();					
-					accelDataCollection.add(data.last());
-				}
-
-				Double total_delta = 0.0;
-				try {
-					total_delta = data.stream().mapToDouble(v -> v.v_delta).sum();
-				} catch (NullPointerException e) {
-					e.printStackTrace();
-				}
-
-				velocity += total_delta;
-				publish(velocity);
-				return null;
-			}
-		};
-
-	}
+	//	private Function<Void, Void> getSpeedAddingFunc() {
+	//		return new Function<Void, Void>() {
+	//
+	//			@Override
+	//			public Void apply(Void t) {
+	//				if (accelDataCollection.size() < 5) {
+	//					return null;
+	//				}
+	//				
+	//				SortedSet<VelocityData<?>> data = null;
+	//				synchronized (accelDataCollection) {
+	//					data = (ConcurrentSkipListSet<VelocityData<?>>) accelDataCollection.clone();
+	//					accelDataCollection.clear();					
+	//					accelDataCollection.add(data.last());
+	//				}
+	//
+	//				Double total_delta = 0.0;
+	//				try {
+	//					total_delta = data.stream().mapToDouble(v -> v.v_delta).sum();
+	//				} catch (NullPointerException e) {
+	//					e.printStackTrace();
+	//				}
+	//
+	//				velocity += total_delta;
+	//				publish(velocity);
+	//				return null;
+	//			}
+	//		};
+	//
+	//	}
 
 
 	private void publish(double v_x) {
@@ -154,7 +158,6 @@ public class VelocityPublisher implements EventHandler, PublisherService {
 
 	@Override
 	public Status getStatus() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -164,6 +167,6 @@ public class VelocityPublisher implements EventHandler, PublisherService {
 	}
 
 	public void stop() {
-		speedAddingFunc = null;
+		//		speedAddingFunc = null;
 	}
 }

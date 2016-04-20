@@ -84,12 +84,12 @@ public class EventLoggerActivator implements BundleActivator, EventHandler, LogL
 		}
 		else if (arg0.getTopic().equals(AccelerationControllerService.EVENT_TOPIC)) {
 			accelWriter.println(
-					arg0.getProperty(AccelerationControllerService.TIMESTAMP_KEY) + ", " +
+					(long)arg0.getProperty(AccelerationControllerService.TIMESTAMP_KEY)*1E-9 + ", " +
 					arg0.getProperty(AccelerationControllerService.X_DATA_KEY));
 		}
 		else if (arg0.getTopic().equals(VelocityControllerService.EVENT_TOPIC)) {
 			velocityWriter.println(
-					arg0.getProperty(VelocityControllerService.TIMESTAMP_KEY) + ", " +
+					(long)arg0.getProperty(VelocityControllerService.TIMESTAMP_KEY)*1E-9 + ", " +
 					arg0.getProperty(VelocityControllerService.VX_KEY));
 		}
 		
