@@ -14,7 +14,7 @@ import no.ntnu.item.its.osgi.sensors.common.interfaces.ColorControllerService;
 import no.ntnu.item.its.osgi.sensors.common.interfaces.MifareControllerService;
 import no.ntnu.item.its.osgi.sensors.mifare.MifareControllerMocker;
 
-public class Activator implements BundleActivator {
+public class SimulationActivator implements BundleActivator {
 
 	private static BundleContext context;
 
@@ -27,7 +27,7 @@ public class Activator implements BundleActivator {
 	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
 	 */
 	public void start(BundleContext bundleContext) throws Exception {
-		Activator.context = bundleContext;
+		SimulationActivator.context = bundleContext;
 		
 		registerMifareMocker();
 		registerColorMocker();
@@ -39,7 +39,7 @@ public class Activator implements BundleActivator {
 	 * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext bundleContext) throws Exception {
-		Activator.context = null;
+		SimulationActivator.context = null;
 	}
 	
 	private static void registerMifareMocker() {
