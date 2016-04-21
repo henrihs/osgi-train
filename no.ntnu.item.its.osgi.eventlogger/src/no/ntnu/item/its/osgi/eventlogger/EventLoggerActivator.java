@@ -1,6 +1,9 @@
 package no.ntnu.item.its.osgi.eventlogger;
 
 import java.io.PrintWriter;
+import java.sql.Time;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Hashtable;
 
 import org.osgi.framework.BundleActivator;
@@ -17,6 +20,7 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 import no.ntnu.item.its.osgi.sensors.common.interfaces.AccelerationControllerService;
+import no.ntnu.item.its.osgi.sensors.common.interfaces.ActuatorControllerService;
 import no.ntnu.item.its.osgi.sensors.common.interfaces.ColorControllerService;
 import no.ntnu.item.its.osgi.sensors.common.interfaces.MifareControllerService;
 import no.ntnu.item.its.osgi.sensors.common.interfaces.VelocityControllerService;
@@ -33,6 +37,7 @@ public class EventLoggerActivator implements BundleActivator, EventHandler, LogL
 	private ServiceTracker<LogReaderService, Object> readerTracker;
 	private PrintWriter accelWriter;
 	private PrintWriter velocityWriter;
+	private PrintWriter commandWriter;
 
 	/*
 	 * (non-Javadoc)
@@ -45,7 +50,8 @@ public class EventLoggerActivator implements BundleActivator, EventHandler, LogL
 				ColorControllerService.EVENT_TOPIC, 
 				MifareControllerService.EVENT_TOPIC,
 				AccelerationControllerService.EVENT_TOPIC,
-				VelocityControllerService.EVENT_TOPIC
+				VelocityControllerService.EVENT_TOPIC,
+				ActuatorControllerService.EVENT_TOPIC
 				};
 		Hashtable<String, Object> serviceProps = new Hashtable<String, Object>();
 		serviceProps.put(EventConstants.EVENT_TOPIC, topics);
@@ -57,8 +63,10 @@ public class EventLoggerActivator implements BundleActivator, EventHandler, LogL
 				new LogReaderTrackerCustomizer());
 		readerTracker.open();
 		
-		accelWriter = new PrintWriter("x_axis_acceleration_log.csv", "UTF-8");
-		velocityWriter = new PrintWriter("x_axis_velocity_log.csv", "UTF-8");
+		long now = System.currentTimeMillis();
+		accelWriter = new PrintWriter("acceleration_" + now + ".csv", "UTF-8");
+		velocityWriter = new PrintWriter("velocity_" + now + ".csv", "UTF-8");
+		commandWriter = new PrintWriter("command_" + now + ".csv", "UTF-8");
 	}
 
 	/*
@@ -69,6 +77,7 @@ public class EventLoggerActivator implements BundleActivator, EventHandler, LogL
 		readerTracker.close();
 		accelWriter.close();
 		velocityWriter.close();
+		commandWriter.close();
 		EventLoggerActivator.context = null;
 	}
 	
@@ -91,6 +100,11 @@ public class EventLoggerActivator implements BundleActivator, EventHandler, LogL
 			velocityWriter.println(
 					(long)arg0.getProperty(VelocityControllerService.TIMESTAMP_KEY)*1E-9 + ", " +
 					arg0.getProperty(VelocityControllerService.VX_KEY));
+		}
+		else if (arg0.getTopic().equals(ActuatorControllerService.EVENT_TOPIC)) {
+			commandWriter.println(
+					(long)arg0.getProperty(ActuatorControllerService.TIMESTAMP_KEY)*1E-9 + ", " +
+					arg0.getProperty(ActuatorControllerService.COMMAND_ISSUED_KEY));
 		}
 		
 	}
