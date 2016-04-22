@@ -4,11 +4,10 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 
-import no.ntnu.item.its.osgi.actuator.pwm.PwmActivator;
 import no.ntnu.item.its.osgi.eventlogger.EventLoggerActivator;
 import no.ntnu.item.its.osgi.publishers.accel.AccelPublisher;
 import no.ntnu.item.its.osgi.publishers.speed.VelocityPublisher;
-import no.ntnu.item.its.osgi.sensors.accel.AccelSensor;
+//import no.ntnu.item.osgi.sensors.simulated.SimulationActivator;
 import no.ntnu.item.osgi.sensors.simulated.SimulationActivator;
 
 public class TestRunActivator implements BundleActivator {
@@ -28,6 +27,7 @@ public class TestRunActivator implements BundleActivator {
 		System.out.println("Starting testrun");
 		FrameworkUtil.getBundle(EventLoggerActivator.class).start();
 //		FrameworkUtil.getBundle(AccelSensor.class).start();
+//		Thread.sleep(3000);
 		FrameworkUtil.getBundle(SimulationActivator.class).start();
 		FrameworkUtil.getBundle(VelocityPublisher.class).start();
 		FrameworkUtil.getBundle(AccelPublisher.class).start();

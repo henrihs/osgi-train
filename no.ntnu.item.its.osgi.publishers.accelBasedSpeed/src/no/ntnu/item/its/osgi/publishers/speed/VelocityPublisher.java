@@ -70,31 +70,28 @@ public class VelocityPublisher implements EventHandler, PublisherService {
 
 		Runnable r = new Runnable() {
 			public void run() {
-				//				VelocityData<?> previous = null;
-				//				if (!accelDataCollection.isEmpty()) {
-				//					try {
-				//						previous = accelDataCollection.last();
-				//					} catch (NoSuchElementException e) {
-				//						previous = null;
-				//					}
-				//				}
-				double a_x = (double) arg0.getProperty(AccelerationControllerService.X_DATA_KEY);
-				long timestamp = (long) arg0.getProperty(AccelerationControllerService.TIMESTAMP_KEY);
-				VelocityData<TrapezoidIntegrator> preSpeedEvent = new VelocityData<TrapezoidIntegrator>(a_x, timestamp,
-						integrator);
-				if (previous != null) {
-					synchronized (previous) {
-						if (previous.getTimestamp() > preSpeedEvent.getTimestamp()) {
-							return; //Don't calculate speed if a newer event is already received
+				try {
+					double a_x = (double) arg0.getProperty(AccelerationControllerService.X_DATA_KEY);
+					long timestamp = (long) arg0.getProperty(AccelerationControllerService.TIMESTAMP_KEY);
+					VelocityData<TrapezoidIntegrator> preSpeedEvent = new VelocityData<TrapezoidIntegrator>(a_x, timestamp,
+							integrator);
+					if (previous != null) {
+						synchronized (previous) {
+							if (previous.getTimestamp() > preSpeedEvent.getTimestamp()) {
+								return; //Don't calculate speed if a newer event is already received
+							}
+	
+							preSpeedEvent.calculateVelocityDelta(previous);
 						}
-
-						preSpeedEvent.calculateVelocityDelta(previous);
 					}
+					//				accelDataCollection.add(preSpeedEvent);
+					velocity += preSpeedEvent.v_delta;
+					publish(velocity);
+					previous = preSpeedEvent;
+				} catch (Exception e) {
+					((LogService)VelocityPubActivator.logServiceTracker.getService())
+					.log(LogService.LOG_ERROR, "Unknown error occured: ", e);
 				}
-				//				accelDataCollection.add(preSpeedEvent);
-				velocity += preSpeedEvent.v_delta;
-				publish(velocity);
-				previous = preSpeedEvent;					
 			}
 		};
 

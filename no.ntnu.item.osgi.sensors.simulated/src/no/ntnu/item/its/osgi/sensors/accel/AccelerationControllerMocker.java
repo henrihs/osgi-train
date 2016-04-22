@@ -14,8 +14,10 @@ public class AccelerationControllerMocker implements AccelerationControllerServi
 	
 	private final ArrayList<Double> decimals; 
 	private Iterator<Double> decimalIterator;
+	private StatisticalGenerator stat;
 
 	public AccelerationControllerMocker() {
+		stat = new StatisticalGenerator(0.1);
 		decimals = new ArrayList<>();
 		for (double i = 0.0; i < 1.0; i+=0.01) {
 			decimals.add(i);
@@ -47,12 +49,16 @@ public class AccelerationControllerMocker implements AccelerationControllerServi
 	public int[] getRawData() throws SensorCommunicationException, SensorInitializationException {
 //		return new int[] {statistic.newPolarInt(), statistic.newPolarInt(), statistic.newPolarInt()};
 		int i = getInt();
-		return new int[] {i,i,i};
+		return new int[] {i+getNoise(),i+getNoise(),i+getNoise()};
 	}
 
 	@Override
 	public int[] getCalibratedData() throws SensorCommunicationException, SensorInitializationException {
 		return getRawData();
+	}
+	
+	public int getNoise() {
+		return stat.newPolarInt();
 	}
 		
 	public int getInt() {

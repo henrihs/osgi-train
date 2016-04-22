@@ -1,5 +1,6 @@
 package no.ntnu.item.its.osgi.logger;
 
+import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -12,7 +13,7 @@ public class Logger implements org.slf4j.Logger {
 		this.name = " [" + name + "] ";
 		logTracker = 
 				new ServiceTracker<LogService, Object>
-						(Activator.getContext(), LogService.class, null);
+						(FrameworkUtil.getBundle(this.getClass()).getBundleContext(), LogService.class, null);
 		logTracker.open();
 	}
 	

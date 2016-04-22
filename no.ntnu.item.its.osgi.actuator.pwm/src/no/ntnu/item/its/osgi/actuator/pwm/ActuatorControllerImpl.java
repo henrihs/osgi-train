@@ -14,6 +14,7 @@ import no.ntnu.item.its.osgi.sensors.common.interfaces.ActuatorControllerService
 
 public class ActuatorControllerImpl implements ActuatorControllerService {
 
+	private static final int SPEED_STEP_SLEEP_TIME = 2;
 	private PWMDevice pwm;
 	private DcMotor motor;
 
@@ -40,11 +41,18 @@ public class ActuatorControllerImpl implements ActuatorControllerService {
 			@Override
 			public void run() {
 				try {
-					motor.setDirection(command);
 					publish(command);
-					for (int i = 0; i < 100; i++) {
-						motor.setSpeed(i);
-						Thread.sleep(7);
+					if (command == MotorCommand.STOP) {
+						for (int i = 149; i >= 0; i--) {
+							motor.setSpeed(i);
+							Thread.sleep(SPEED_STEP_SLEEP_TIME);
+						}
+					} else {
+						motor.setDirection(command);
+						for (int i = 0; i < 150; i++) {
+							motor.setSpeed(i);
+							Thread.sleep(SPEED_STEP_SLEEP_TIME);
+						}
 					}
 					
 				} catch (IOException e) {

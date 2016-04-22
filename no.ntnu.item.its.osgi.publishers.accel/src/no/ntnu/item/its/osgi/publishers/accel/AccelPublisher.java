@@ -22,7 +22,7 @@ public class AccelPublisher implements PublisherService {
 	
 	public static final long SCHEDULE_PERIOD = 50;
 	private static final PublisherType TYPE = PublisherType.ACCEL;
-	private static final float ALPHA = 0.15f;
+	private static final float ALPHA = 0.3f;
 
 	private Function<Void, Void> sensorReading;
 	private double[] previous;
@@ -139,13 +139,29 @@ public class AccelPublisher implements PublisherService {
 		return accelData;
 	}
 	
-	private double[] lowPass( double[] input, double[] output ) {
+	private double[] lowPass(double[] input, double[] output) {
 	    if ( output == null ) return input;
 	     
 	    for ( int i=0; i<input.length; i++ ) {
-	        output[i] = output[i] + ALPHA * (input[i] - output[i]);
+	    	if (input[i] > -0.1 && input[i] < 0.1) {
+	    		output[i] = 0;
+	    	}
+	    	
+	    	
+	    	output[i] = output[i] + getAlpha(input[i]) * (input[i] - output[i]);
 	    }
 	    return output;
+	}
+	
+	private double getAlpha(double input) {
+		double absValue = Math.abs(input);
+		if ( absValue < 0.001) {
+			return 1.0;
+		}
+		
+		else {
+			return 0.2 - 1/10*Math.log(absValue);
+		}
 	}
 
 }

@@ -22,10 +22,11 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 import no.ntnu.item.its.osgi.sensors.common.interfaces.AccelerationControllerService;
 import no.ntnu.item.its.osgi.sensors.common.interfaces.ActuatorControllerService;
 import no.ntnu.item.its.osgi.sensors.common.interfaces.ColorControllerService;
+import no.ntnu.item.its.osgi.sensors.common.interfaces.MagControllerService;
 import no.ntnu.item.its.osgi.sensors.common.interfaces.MifareControllerService;
 import no.ntnu.item.its.osgi.sensors.common.interfaces.VelocityControllerService;
 
-public class EventLoggerActivator implements BundleActivator, EventHandler, LogListener {
+public class EventLoggerActivator implements BundleActivator, EventHandler {
 
 	private static BundleContext context;
 
@@ -34,10 +35,10 @@ public class EventLoggerActivator implements BundleActivator, EventHandler, LogL
 	}
 
 	private String[] topics;
-	private ServiceTracker<LogReaderService, Object> readerTracker;
 	private PrintWriter accelWriter;
 	private PrintWriter velocityWriter;
 	private PrintWriter commandWriter;
+	private PrintWriter headingWriter;
 
 	/*
 	 * (non-Javadoc)
@@ -51,22 +52,18 @@ public class EventLoggerActivator implements BundleActivator, EventHandler, LogL
 				MifareControllerService.EVENT_TOPIC,
 				AccelerationControllerService.EVENT_TOPIC,
 				VelocityControllerService.EVENT_TOPIC,
-				ActuatorControllerService.EVENT_TOPIC
+				ActuatorControllerService.EVENT_TOPIC,
+				MagControllerService.EVENT_TOPIC
 				};
 		Hashtable<String, Object> serviceProps = new Hashtable<String, Object>();
 		serviceProps.put(EventConstants.EVENT_TOPIC, topics);
 		bundleContext.registerService(EventHandler.class.getName(), this, serviceProps);
 		
-		readerTracker = new ServiceTracker<LogReaderService, Object>(
-				bundleContext, 
-				LogReaderService.class,
-				new LogReaderTrackerCustomizer());
-		readerTracker.open();
-		
 		long now = System.currentTimeMillis();
 		accelWriter = new PrintWriter("acceleration_" + now + ".csv", "UTF-8");
 		velocityWriter = new PrintWriter("velocity_" + now + ".csv", "UTF-8");
 		commandWriter = new PrintWriter("command_" + now + ".csv", "UTF-8");
+		headingWriter = new PrintWriter("mag_" + now + ".csv", "UTF-8");
 	}
 
 	/*
@@ -74,10 +71,10 @@ public class EventLoggerActivator implements BundleActivator, EventHandler, LogL
 	 * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext bundleContext) throws Exception {
-		readerTracker.close();
 		accelWriter.close();
 		velocityWriter.close();
 		commandWriter.close();
+		headingWriter.close();
 		EventLoggerActivator.context = null;
 	}
 	
@@ -106,54 +103,11 @@ public class EventLoggerActivator implements BundleActivator, EventHandler, LogL
 					(long)arg0.getProperty(ActuatorControllerService.TIMESTAMP_KEY)*1E-9 + ", " +
 					arg0.getProperty(ActuatorControllerService.COMMAND_ISSUED_KEY));
 		}
-		
-	}
-	
-	public void listenTo(LogReaderService logReader) {
-		logReader.addLogListener(this);
-	}
-
-	@Override
-	public void logged(LogEntry arg0) {
-		String level = null;
-		switch (arg0.getLevel()) {
-		case LogService.LOG_DEBUG:
-			level = "DEBUG";
-			break;
-		case LogService.LOG_INFO:
-			level = "INFO";
-			break;
-		case LogService.LOG_WARNING:
-			level = "WARNING";
-			break;
-		case LogService.LOG_ERROR:
-			level = "ERROR";
-			break;
+		else if (arg0.getTopic().equals(MagControllerService.EVENT_TOPIC)) {
+			headingWriter.println(
+					(long)arg0.getProperty(MagControllerService.TIMESTAMP_KEY)*1E-9 + ", " + 
+					arg0.getProperty(MagControllerService.HEADING_KEY));
 		}
-		
-		String content = arg0.getMessage();
-		if (arg0.getException() != null && arg0.getException().getCause() != null) {
-			content = content.concat(": ").concat(arg0.getException().getMessage());
-		}
-		
-		System.out.println(String.format(
-				"[%s]%s: %s",
-				level, 
-				arg0.getBundle(),
-				content));				
 	}
-
-	private class LogReaderTrackerCustomizer implements ServiceTrackerCustomizer<LogReaderService, Object> {
-		@Override
-		public Object addingService(ServiceReference<LogReaderService> arg0) {
-			listenTo(context.getService(arg0));
-			return null;
-		}
-		@Override
-		public void modifiedService(ServiceReference<LogReaderService> arg0, Object arg1) {}
-		@Override
-		public void removedService(ServiceReference<LogReaderService> arg0, Object arg1) {}
-	}
-
 }
 

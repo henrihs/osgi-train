@@ -34,15 +34,17 @@ public class StatisticalGenerator {
 		return lastInt; 
 	}
 	
-	private int getRandInt() {
+	public int getRandInt() {
 		int randInt = r.nextInt(100);
 		return randInt;
 	}
+	
+	
 
 	public int newPolarInt() {
 		int polarity = 1;
 		if (r.nextBoolean())
 			polarity = -1;
-		return r.nextInt(2048) * polarity;
+		return r.nextInt(100) * polarity;
 	}
 }
