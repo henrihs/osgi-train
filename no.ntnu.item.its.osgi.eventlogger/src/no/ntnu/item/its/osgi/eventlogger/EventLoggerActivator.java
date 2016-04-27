@@ -100,8 +100,12 @@ public class EventLoggerActivator implements BundleActivator, EventHandler {
 		}
 		else if (arg0.getTopic().equals(ActuatorControllerService.EVENT_TOPIC)) {
 			commandWriter.println(
+					((long)arg0.getProperty(ActuatorControllerService.TIMESTAMP_KEY)-1)*1E-9 + ", " +
+					arg0.getProperty(ActuatorControllerService.PREV_STATE_KEY));
+			
+			commandWriter.println(
 					(long)arg0.getProperty(ActuatorControllerService.TIMESTAMP_KEY)*1E-9 + ", " +
-					arg0.getProperty(ActuatorControllerService.COMMAND_ISSUED_KEY));
+					arg0.getProperty(ActuatorControllerService.NEXT_STATE_KEY));
 		}
 		else if (arg0.getTopic().equals(MagControllerService.EVENT_TOPIC)) {
 			headingWriter.println(

@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Map
+Bundle-SymbolicName: no.ntnu.item.its.osgi.map
+Bundle-Version: 1.0.0
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Import-Package: bluebrick4j.api,
+ bluebrick4j.model
+Export-Package: no.ntnu.item.its.osgi.map.enums,
+ no.ntnu.item.its.osgi.map.model

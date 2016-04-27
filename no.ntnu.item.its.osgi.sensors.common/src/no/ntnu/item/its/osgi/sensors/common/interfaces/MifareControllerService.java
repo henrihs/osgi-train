@@ -3,6 +3,7 @@ package no.ntnu.item.its.osgi.sensors.common.interfaces;
 import javax.naming.SizeLimitExceededException;
 
 import no.ntnu.item.its.osgi.sensors.common.MifareKeyRing;
+import no.ntnu.item.its.osgi.sensors.common.exceptions.NoCardFoundException;
 import no.ntnu.item.its.osgi.sensors.common.exceptions.SensorCommunicationException;
 
 /*
@@ -23,7 +24,7 @@ public interface MifareControllerService {
 	 * @param keyRing the key used to authenticate the Mifare block in question
 	 * @param content the data to write to the block (maximum size is 16 bytes)
 	 */
-	public void write(int block, MifareKeyRing keyRing, String content) throws SensorCommunicationException, SizeLimitExceededException;
+	public void write(int block, MifareKeyRing keyRing, String content) throws SensorCommunicationException, SizeLimitExceededException, NoCardFoundException;
 	
 	/*
 	 * Read a block of data from a Mifare tag
@@ -33,6 +34,6 @@ public interface MifareControllerService {
 	 * 
 	 * @returns the content from the block in question, represented as a String value
 	 */
-	public String read(int block, MifareKeyRing keyRing) throws SensorCommunicationException;
+	public String read(int block, MifareKeyRing keyRing) throws SensorCommunicationException, NoCardFoundException;
 	
 }

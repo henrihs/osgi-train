@@ -17,6 +17,7 @@ public class ActuatorControllerImpl implements ActuatorControllerService {
 	private static final int SPEED_STEP_SLEEP_TIME = 2;
 	private PWMDevice pwm;
 	private DcMotor motor;
+	private MotorCommand previousState = MotorCommand.STOP;
 
 	public ActuatorControllerImpl() throws SensorInitializationException {
 		this (1, 0x60);
@@ -84,8 +85,12 @@ public class ActuatorControllerImpl implements ActuatorControllerService {
 				ActuatorControllerService.TIMESTAMP_KEY, 
 				System.nanoTime());
 		properties.put(
-				ActuatorControllerService.COMMAND_ISSUED_KEY, 
+				ActuatorControllerService.PREV_STATE_KEY, 
+				previousState);
+		properties.put(
+				ActuatorControllerService.NEXT_STATE_KEY, 
 				command);
+		previousState = command;
 		return new Event(ActuatorControllerService.EVENT_TOPIC, properties);
 	}
 	

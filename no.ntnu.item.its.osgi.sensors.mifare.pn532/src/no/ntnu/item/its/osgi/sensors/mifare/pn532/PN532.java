@@ -122,7 +122,7 @@ public class PN532 implements IPN532 {
 		command[3] = (byte) blockNumber;
 
 		if (medium.writeCommand(command) != CommandStatus.OK) {
-			return false; // command failed
+			return false;
 		}
 
 		if (medium.readResponse(pn532_packetbuffer, 26) < 0) {

@@ -13,6 +13,7 @@ import org.osgi.util.tracker.ServiceTracker;
 
 import no.ntnu.item.its.osgi.sensors.common.enums.PublisherType;
 import no.ntnu.item.its.osgi.sensors.common.enums.Status;
+import no.ntnu.item.its.osgi.sensors.common.exceptions.SensorCommunicationException;
 import no.ntnu.item.its.osgi.sensors.common.interfaces.MagControllerService;
 import no.ntnu.item.its.osgi.sensors.common.interfaces.PublisherService;
 import no.ntnu.item.its.osgi.sensors.common.interfaces.SensorSchedulerService;
@@ -70,6 +71,7 @@ public class MagPublisher implements PublisherService {
 	
 	private Function<Void, Void> getSensorReadingFunc() {
 		return new Function<Void, Void>() {
+			private int successiveExceptions = 0;
 			
 			@Override
 			public Void apply(Void t) {
@@ -79,9 +81,13 @@ public class MagPublisher implements PublisherService {
 					
 					double[] magData = mcs.getRawData();
 					double heading = calculateHeading(magData);
+					successiveExceptions = 0;
 					publish(magData, heading);
-					
 				} catch (Exception e) {
+					if (e.getClass().equals(SensorCommunicationException.class) && successiveExceptions++ < 4) {
+						return t;
+					}
+					
 					((LogService)MagPubActivator.logServiceTracker.getService()).log(
 							LogService.LOG_ERROR, 
 							"Faulted while reading from sensor service", e);

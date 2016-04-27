@@ -8,6 +8,7 @@ import java.util.Arrays;
 import javax.naming.SizeLimitExceededException;
 
 import no.ntnu.item.its.osgi.sensors.common.MifareKeyRing;
+import no.ntnu.item.its.osgi.sensors.common.exceptions.NoCardFoundException;
 import no.ntnu.item.its.osgi.sensors.common.exceptions.SensorCommunicationException;
 import no.ntnu.item.its.osgi.sensors.common.exceptions.SensorInitializationException;
 import no.ntnu.item.its.osgi.sensors.common.interfaces.MifareControllerService;
@@ -21,7 +22,7 @@ public class MifareControllerImpl implements MifareControllerService {
 	}
 		
 	@Override
-	public void write(int block, MifareKeyRing keyRing, String content) throws SensorCommunicationException, SizeLimitExceededException {
+	public void write(int block, MifareKeyRing keyRing, String content) throws SensorCommunicationException, SizeLimitExceededException, NoCardFoundException {
 		if (!authenticate(block, keyRing)) {
 			throw new SensorCommunicationException("Unknown authentication error occured");
 		}
@@ -40,12 +41,12 @@ public class MifareControllerImpl implements MifareControllerService {
 	}
 
 	@Override
-	public String read(int block, MifareKeyRing keyRing) throws SensorCommunicationException {
+	public String read(int block, MifareKeyRing keyRing) throws SensorCommunicationException, NoCardFoundException {
+		byte[] bytesRead = new byte[16];
+		
 		if (!authenticate(block, keyRing)) {
 			throw new SensorCommunicationException("Unknown authentication error occured");
 		}
-		
-		byte[] bytesRead = new byte[16];
 		try {
 			if (!pn532.readMifareBlock(block, bytesRead)) {
 				throw new SensorCommunicationException(String.format("Could not read data from block %d, check your connection", block));
@@ -87,7 +88,7 @@ public class MifareControllerImpl implements MifareControllerService {
 		return new String(b);
 	}
 	
-	private boolean authenticate(int block, MifareKeyRing keyRing) throws SensorCommunicationException {
+	private boolean authenticate(int block, MifareKeyRing keyRing) throws SensorCommunicationException, NoCardFoundException {
 		byte[] uid = new byte[16];
 		int uidLen;
 		try {
@@ -95,12 +96,12 @@ public class MifareControllerImpl implements MifareControllerService {
 			if (uidLen <= 0)
 				throw new IOException();
 		} catch (InterruptedException | IOException e) {
-			throw new SensorCommunicationException("Could authenticate mifare card, no card found!");
+			throw new NoCardFoundException("Could not authenticate mifare card, no card found!");
 		}
 		
 		uid = Arrays.copyOf(uid, uidLen);
 		try {
-			return pn532.authenticateMifareBlock((byte)10, keyRing.type, keyRing.key, uid);
+			return pn532.authenticateMifareBlock((byte)block, keyRing.type, keyRing.key, uid);
 		} catch (InterruptedException | IOException e) {
 			throw new SensorCommunicationException("Authentication error", e);
 		}		

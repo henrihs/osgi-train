@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Positioning
+Bundle-SymbolicName: no.ntnu.item.its.osgi.positioning
+Bundle-Version: 1.0.0
+Bundle-Activator: no.ntnu.item.its.osgi.positioning.PositioningActivator
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Import-Package: bluebrick4j.model,
+ no.ntnu.item.its.osgi.map.model,
+ no.ntnu.item.its.osgi.sensors.common.interfaces,
+ org.osgi.framework;version="1.3.0",
+ org.osgi.service.event;version="1.3.0",
+ org.osgi.service.log;version="1.3.0",
+ org.osgi.util.tracker;version="1.5.1"

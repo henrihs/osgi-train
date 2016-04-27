@@ -90,7 +90,7 @@ public class PN532I2C implements IPN532Interface {
       i2cDevice.write(DEVICE_ADDRESS, bytesToSend, 0, bytesToSend.length);
 
     } catch (IOException e) {
-      System.out.println("pn532i2c.writeCommand exception occured: " + e.getMessage());
+      log("pn532i2c.writeCommand exception occured: " + e.getMessage());
       return CommandStatus.INVALID_ACK;
     }
     log("pn532i2c.writeCommand transferring to waitForAck())");

@@ -15,6 +15,7 @@ import no.ntnu.item.its.osgi.sensors.common.MifareKeyRing;
 import no.ntnu.item.its.osgi.sensors.common.enums.MifareKeyType;
 import no.ntnu.item.its.osgi.sensors.common.enums.PublisherType;
 import no.ntnu.item.its.osgi.sensors.common.enums.Status;
+import no.ntnu.item.its.osgi.sensors.common.exceptions.NoCardFoundException;
 import no.ntnu.item.its.osgi.sensors.common.exceptions.SensorCommunicationException;
 import no.ntnu.item.its.osgi.sensors.common.interfaces.MifareControllerService;
 import no.ntnu.item.its.osgi.sensors.common.interfaces.PublisherService;
@@ -23,7 +24,8 @@ import no.ntnu.item.its.osgi.sensors.common.servicetrackers.SchedulerTrackerCust
 
 public class MifarePublisher implements PublisherService {
 
-	public static final long SCHEDULE_PERIOD = 1000;
+	public static final long SCHEDULE_PERIOD = 300;
+	public static final long SLEEP_AFTER_PUBLISH_TIME = 1500;
 	private static final PublisherType TYPE = PublisherType.BEACON;
 	
 	private Function<Void, Void> sensorReading;
@@ -71,17 +73,28 @@ public class MifarePublisher implements PublisherService {
 
 			@Override
 			public Void apply(Void t) {
-				String content; 
+				String locationInfo; 
 				try {
 					MifareControllerService s = 
 							(MifareControllerService)MifarePubActivator.
 								mifareControllerTracker.getService();
-					content = s.read(42, new MifareKeyRing(MifareKeyType.A));
-					if (!content.isEmpty()) {
-						publish(content);
+					locationInfo = s.read(42, new MifareKeyRing(MifareKeyType.A));
+					if (!locationInfo.isEmpty()) {
+						publish(locationInfo);
+					} else {
+						((LogService)MifarePubActivator.logServiceTracker.getService()).log(
+								LogService.LOG_INFO, 
+								"Passed beacon with empty location information");
 					}
+					
+					Thread.sleep(SLEEP_AFTER_PUBLISH_TIME);
+				} catch (NoCardFoundException e) {
 				} catch (SensorCommunicationException e) {
+					((LogService)MifarePubActivator.logServiceTracker.getService()).log(
+							LogService.LOG_WARNING, 
+							"Problems with sensor reading", e);
 				} catch (Exception e) {
+					e.printStackTrace();
 					((LogService)MifarePubActivator.logServiceTracker.getService()).log(
 							LogService.LOG_ERROR, 
 							"Faulted while reading from sensor service", e);

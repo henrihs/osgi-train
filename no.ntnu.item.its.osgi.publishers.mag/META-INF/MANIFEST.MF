@@ -6,6 +6,7 @@ Bundle-Version: 1.0.0
 Bundle-Activator: no.ntnu.item.its.osgi.publishers.mag.MagPubActivator
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: no.ntnu.item.its.osgi.sensors.common.enums,
+ no.ntnu.item.its.osgi.sensors.common.exceptions,
  no.ntnu.item.its.osgi.sensors.common.interfaces,
  no.ntnu.item.its.osgi.sensors.common.servicetrackers,
  org.osgi.framework;version="1.3.0",
