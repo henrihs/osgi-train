@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import no.ntnu.item.its.osgi.sensors.common.enums.EColor;
+import no.ntnu.item.its.osgi.common.enums.EColor;
 
 public class ColorClassifier {
 	

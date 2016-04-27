@@ -6,10 +6,10 @@ Bundle-Version: 1.0.0
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: com.pi4j.io.i2c,
  com.pi4j.wiringpi,
- no.ntnu.item.its.osgi.sensors.common,
- no.ntnu.item.its.osgi.sensors.common.enums,
- no.ntnu.item.its.osgi.sensors.common.exceptions,
- no.ntnu.item.its.osgi.sensors.common.interfaces,
+ no.ntnu.item.its.osgi.common,
+ no.ntnu.item.its.osgi.common.enums,
+ no.ntnu.item.its.osgi.common.exceptions,
+ no.ntnu.item.its.osgi.common.interfaces,
  org.osgi.framework;version="1.3.0",
  org.osgi.service.log;version="1.3.0"
 Export-Package: no.ntnu.item.its.osgi.sensors.mifare;version="1.0.0";uses:="no.ntnu.item.its.osgi.sensors.common.interfaces,com.pi4j.io.i2c,com.pi4j.wiringpi"

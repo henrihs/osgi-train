@@ -7,8 +7,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogService;
 
-import no.ntnu.item.its.osgi.sensors.common.enums.SensorNature;
-import no.ntnu.item.its.osgi.sensors.common.interfaces.MagControllerService;
+import no.ntnu.item.its.osgi.common.enums.SensorNature;
+import no.ntnu.item.its.osgi.common.interfaces.MagControllerService;
 
 public class MagActivator implements BundleActivator {
 

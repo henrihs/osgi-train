@@ -7,10 +7,10 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogService;
 
+import no.ntnu.item.its.osgi.common.enums.SensorNature;
+import no.ntnu.item.its.osgi.common.interfaces.ColorControllerService;
 import no.ntnu.item.its.osgi.sensors.color.impl.Constants;
 import no.ntnu.item.its.osgi.sensors.color.impl.TCS34725;
-import no.ntnu.item.its.osgi.sensors.common.enums.SensorNature;
-import no.ntnu.item.its.osgi.sensors.common.interfaces.ColorControllerService;
 
 public class ColorSensor implements BundleActivator {
 

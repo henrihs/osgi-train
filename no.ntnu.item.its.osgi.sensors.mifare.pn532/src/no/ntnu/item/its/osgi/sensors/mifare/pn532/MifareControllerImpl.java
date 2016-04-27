@@ -7,11 +7,11 @@ import java.util.Arrays;
 
 import javax.naming.SizeLimitExceededException;
 
-import no.ntnu.item.its.osgi.sensors.common.MifareKeyRing;
-import no.ntnu.item.its.osgi.sensors.common.exceptions.NoCardFoundException;
-import no.ntnu.item.its.osgi.sensors.common.exceptions.SensorCommunicationException;
-import no.ntnu.item.its.osgi.sensors.common.exceptions.SensorInitializationException;
-import no.ntnu.item.its.osgi.sensors.common.interfaces.MifareControllerService;
+import no.ntnu.item.its.osgi.common.MifareKeyRing;
+import no.ntnu.item.its.osgi.common.exceptions.NoCardFoundException;
+import no.ntnu.item.its.osgi.common.exceptions.SensorCommunicationException;
+import no.ntnu.item.its.osgi.common.exceptions.SensorInitializationException;
+import no.ntnu.item.its.osgi.common.interfaces.MifareControllerService;
 
 public class MifareControllerImpl implements MifareControllerService {
 

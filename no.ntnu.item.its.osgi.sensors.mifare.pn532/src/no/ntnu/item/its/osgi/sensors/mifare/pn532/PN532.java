@@ -3,8 +3,8 @@ package no.ntnu.item.its.osgi.sensors.mifare.pn532;
 import java.io.IOException;
 import java.util.Arrays;
 
-import no.ntnu.item.its.osgi.sensors.common.enums.MifareKeyType;
-import no.ntnu.item.its.osgi.sensors.common.enums.Status;
+import no.ntnu.item.its.osgi.common.enums.MifareKeyType;
+import no.ntnu.item.its.osgi.common.enums.Status;
 
 public class PN532 implements IPN532 {
 

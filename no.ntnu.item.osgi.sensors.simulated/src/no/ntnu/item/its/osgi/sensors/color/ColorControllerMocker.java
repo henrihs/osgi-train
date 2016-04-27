@@ -1,7 +1,7 @@
 package no.ntnu.item.its.osgi.sensors.color;
 
-import no.ntnu.item.its.osgi.sensors.common.exceptions.SensorCommunicationException;
-import no.ntnu.item.its.osgi.sensors.common.interfaces.ColorControllerService;
+import no.ntnu.item.its.osgi.common.exceptions.SensorCommunicationException;
+import no.ntnu.item.its.osgi.common.interfaces.ColorControllerService;
 import no.ntnu.item.osgi.sensors.simulated.StatisticalGenerator;
 
 public class ColorControllerMocker implements ColorControllerService {

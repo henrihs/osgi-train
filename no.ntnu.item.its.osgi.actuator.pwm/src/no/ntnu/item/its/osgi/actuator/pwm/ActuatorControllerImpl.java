@@ -8,9 +8,9 @@ import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.log.LogService;
 
-import no.ntnu.item.its.osgi.sensors.common.enums.MotorCommand;
-import no.ntnu.item.its.osgi.sensors.common.exceptions.SensorInitializationException;
-import no.ntnu.item.its.osgi.sensors.common.interfaces.ActuatorControllerService;
+import no.ntnu.item.its.osgi.common.enums.MotorCommand;
+import no.ntnu.item.its.osgi.common.exceptions.SensorInitializationException;
+import no.ntnu.item.its.osgi.common.interfaces.ActuatorControllerService;
 
 public class ActuatorControllerImpl implements ActuatorControllerService {
 
@@ -18,12 +18,13 @@ public class ActuatorControllerImpl implements ActuatorControllerService {
 	private PWMDevice pwm;
 	private DcMotor motor;
 	private MotorCommand previousState = MotorCommand.STOP;
+	private int currentSpeed = 0;
 
 	public ActuatorControllerImpl() throws SensorInitializationException {
 		this (1, 0x60);
-		
+
 	}
-	
+
 	public ActuatorControllerImpl(int bus, int address) throws SensorInitializationException {
 		try {
 			pwm = new PWMDevice(bus, address);
@@ -31,31 +32,33 @@ public class ActuatorControllerImpl implements ActuatorControllerService {
 		} catch (IOException e) {
 			throw new SensorInitializationException("Could not initialize PWM actuator", e);
 		}
-		
+
 		motor = new DcMotor(this, 1);		
 	}
-	
+
 	@Override
 	public void send(MotorCommand command) {
 		Runnable r = new Runnable() {
-			
+
 			@Override
 			public void run() {
 				try {
-					publish(command);
-					if (command == MotorCommand.STOP) {
-						for (int i = 149; i >= 0; i--) {
-							motor.setSpeed(i);
-							Thread.sleep(SPEED_STEP_SLEEP_TIME);
-						}
-					} else {
-						motor.setDirection(command);
-						for (int i = 0; i < 150; i++) {
-							motor.setSpeed(i);
-							Thread.sleep(SPEED_STEP_SLEEP_TIME);
+					synchronized (motor) {						
+						publish(command);
+						if (command == MotorCommand.STOP) {
+							for (int i = 149; i >= 0; i--) {
+								motor.setSpeed(i);
+								Thread.sleep(SPEED_STEP_SLEEP_TIME);
+							}
+						} else {
+							motor.setDirection(command);
+							for (int i = 0; i < 150; i++) {
+								motor.setSpeed(i);
+								Thread.sleep(SPEED_STEP_SLEEP_TIME);
+							}
 						}
 					}
-					
+
 				} catch (IOException e) {
 					if (!PwmActivator.logServiceTracker.isEmpty()) {
 						((LogService)PwmActivator.logServiceTracker.getService()).log(
@@ -69,10 +72,49 @@ public class ActuatorControllerImpl implements ActuatorControllerService {
 				}				
 			}
 		};
-		
+
 		new Thread(r).start();
 	}
-	
+
+	@Override
+	public void send(MotorCommand command, int speed) {
+		Runnable r = new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					synchronized(motor) {
+						if (command == MotorCommand.STOP) {
+							for (int i = currentSpeed; i >= 0; i--) {
+								motor.setSpeed(i);
+								Thread.sleep(SPEED_STEP_SLEEP_TIME);
+							}
+						} else {
+							motor.setDirection(command);
+							if (speed < currentSpeed) {
+								for (int i = currentSpeed; i >= speed; i--) {
+									motor.setSpeed(i);
+									Thread.sleep(SPEED_STEP_SLEEP_TIME);
+								}
+							}
+							else if (speed > currentSpeed) {
+								for (int i = currentSpeed; i <= speed; i++) {
+									motor.setSpeed(i);
+									Thread.sleep(SPEED_STEP_SLEEP_TIME);
+								}
+							}
+
+						}
+					}
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
+			}
+		};
+
+		new Thread(r).start();
+	}
+
 	private void publish(MotorCommand command) {
 		if (!PwmActivator.eventAdminTracker.isEmpty()) { 
 			((EventAdmin)PwmActivator.eventAdminTracker.getService()).postEvent(createEvent(command));
@@ -93,7 +135,7 @@ public class ActuatorControllerImpl implements ActuatorControllerService {
 		previousState = command;
 		return new Event(ActuatorControllerService.EVENT_TOPIC, properties);
 	}
-	
+
 
 	void setPin(int inPin, boolean state) throws IOException {
 		if (inPin < 0 || inPin > 15)
@@ -108,7 +150,7 @@ public class ActuatorControllerImpl implements ActuatorControllerService {
 	void setPwm(int channel, int on, int off) throws IOException {
 		pwm.getChannel(channel).setPWM(on, off);
 	}
-	
+
 	public static void main(String[] args) {
 		try {
 			ActuatorControllerImpl c = new ActuatorControllerImpl(1, 0x60);

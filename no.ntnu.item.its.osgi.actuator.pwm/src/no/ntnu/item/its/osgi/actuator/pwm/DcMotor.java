@@ -2,7 +2,7 @@ package no.ntnu.item.its.osgi.actuator.pwm;
 
 import java.io.IOException;
 
-import no.ntnu.item.its.osgi.sensors.common.enums.MotorCommand;
+import no.ntnu.item.its.osgi.common.enums.MotorCommand;
 
 public class DcMotor {
 	

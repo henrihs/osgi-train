@@ -2,8 +2,8 @@ package no.ntnu.item.its.osgi.sensors.mifare.pn532;
 
 import java.io.IOException;
 
-import no.ntnu.item.its.osgi.sensors.common.enums.MifareKeyType;
-import no.ntnu.item.its.osgi.sensors.common.interfaces.PublisherService;
+import no.ntnu.item.its.osgi.common.enums.MifareKeyType;
+import no.ntnu.item.its.osgi.common.interfaces.PublisherService;
 
 /*
  * This interface represents a PN532 RFID/NFC card for the Raspberry Pi

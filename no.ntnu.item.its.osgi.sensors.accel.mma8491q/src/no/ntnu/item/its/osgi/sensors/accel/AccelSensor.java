@@ -7,9 +7,9 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogService;
 
+import no.ntnu.item.its.osgi.common.enums.SensorNature;
+import no.ntnu.item.its.osgi.common.interfaces.AccelerationControllerService;
 import no.ntnu.item.its.osgi.sensors.accel.mma8491q.AccelerationControllerImpl;
-import no.ntnu.item.its.osgi.sensors.common.enums.SensorNature;
-import no.ntnu.item.its.osgi.sensors.common.interfaces.AccelerationControllerService;
 
 public class AccelSensor implements BundleActivator {
 

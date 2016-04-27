@@ -6,7 +6,7 @@ import org.osgi.service.event.EventAdmin;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
-import no.ntnu.item.its.osgi.sensors.common.interfaces.ColorControllerService;
+import no.ntnu.item.its.osgi.common.interfaces.ColorControllerService;
 
 public class ColorPubActivator implements BundleActivator {
 

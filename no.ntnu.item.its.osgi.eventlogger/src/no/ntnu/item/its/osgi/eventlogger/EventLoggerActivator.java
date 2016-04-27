@@ -19,12 +19,12 @@ import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
-import no.ntnu.item.its.osgi.sensors.common.interfaces.AccelerationControllerService;
-import no.ntnu.item.its.osgi.sensors.common.interfaces.ActuatorControllerService;
-import no.ntnu.item.its.osgi.sensors.common.interfaces.ColorControllerService;
-import no.ntnu.item.its.osgi.sensors.common.interfaces.MagControllerService;
-import no.ntnu.item.its.osgi.sensors.common.interfaces.MifareControllerService;
-import no.ntnu.item.its.osgi.sensors.common.interfaces.VelocityControllerService;
+import no.ntnu.item.its.osgi.common.interfaces.AccelerationControllerService;
+import no.ntnu.item.its.osgi.common.interfaces.ActuatorControllerService;
+import no.ntnu.item.its.osgi.common.interfaces.ColorControllerService;
+import no.ntnu.item.its.osgi.common.interfaces.MagControllerService;
+import no.ntnu.item.its.osgi.common.interfaces.MifareControllerService;
+import no.ntnu.item.its.osgi.common.interfaces.VelocityControllerService;
 
 public class EventLoggerActivator implements BundleActivator, EventHandler {
 

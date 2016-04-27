@@ -13,9 +13,9 @@ import com.pi4j.io.i2c.I2CBus;
 import com.pi4j.io.i2c.I2CDevice;
 import com.pi4j.io.i2c.I2CFactory;
 
-import no.ntnu.item.its.osgi.sensors.common.exceptions.SensorCommunicationException;
-import no.ntnu.item.its.osgi.sensors.common.exceptions.SensorInitializationException;
-import no.ntnu.item.its.osgi.sensors.common.interfaces.AccelerationControllerService;
+import no.ntnu.item.its.osgi.common.exceptions.SensorCommunicationException;
+import no.ntnu.item.its.osgi.common.exceptions.SensorInitializationException;
+import no.ntnu.item.its.osgi.common.interfaces.AccelerationControllerService;
 
 public class AccelerationControllerImpl implements AccelerationControllerService {
 

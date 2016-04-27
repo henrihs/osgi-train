@@ -6,9 +6,9 @@ import org.osgi.service.event.EventAdmin;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
-import no.ntnu.item.its.osgi.sensors.common.enums.MotorCommand;
-import no.ntnu.item.its.osgi.sensors.common.exceptions.SensorInitializationException;
-import no.ntnu.item.its.osgi.sensors.common.interfaces.ActuatorControllerService;
+import no.ntnu.item.its.osgi.common.enums.MotorCommand;
+import no.ntnu.item.its.osgi.common.exceptions.SensorInitializationException;
+import no.ntnu.item.its.osgi.common.interfaces.ActuatorControllerService;
 
 public class PwmActivator implements BundleActivator {
 
@@ -38,7 +38,7 @@ public class PwmActivator implements BundleActivator {
 		try {
 			controller = new ActuatorControllerImpl();
 			bundleContext.registerService(ActuatorControllerService.class, controller, null);
-			controller.send(MotorCommand.FORWARD);			
+			controller.send(MotorCommand.FORWARD, 110);			
 		} catch (SensorInitializationException e) {
 			if (!logServiceTracker.isEmpty()) {
 				((LogService)logServiceTracker.getService()).log(

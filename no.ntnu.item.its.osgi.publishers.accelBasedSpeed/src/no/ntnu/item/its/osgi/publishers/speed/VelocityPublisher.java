@@ -16,13 +16,13 @@ import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 import org.apache.commons.math.analysis.integration.*;
 
-import no.ntnu.item.its.osgi.sensors.common.enums.PublisherType;
-import no.ntnu.item.its.osgi.sensors.common.enums.Status;
-import no.ntnu.item.its.osgi.sensors.common.interfaces.AccelerationControllerService;
-import no.ntnu.item.its.osgi.sensors.common.interfaces.PublisherService;
-import no.ntnu.item.its.osgi.sensors.common.interfaces.SensorSchedulerService;
-import no.ntnu.item.its.osgi.sensors.common.interfaces.VelocityControllerService;
-import no.ntnu.item.its.osgi.sensors.common.servicetrackers.SchedulerTrackerCustomizer;
+import no.ntnu.item.its.osgi.common.enums.PublisherType;
+import no.ntnu.item.its.osgi.common.enums.Status;
+import no.ntnu.item.its.osgi.common.interfaces.AccelerationControllerService;
+import no.ntnu.item.its.osgi.common.interfaces.PublisherService;
+import no.ntnu.item.its.osgi.common.interfaces.SensorSchedulerService;
+import no.ntnu.item.its.osgi.common.interfaces.VelocityControllerService;
+import no.ntnu.item.its.osgi.common.servicetrackers.SchedulerTrackerCustomizer;
 
 public class VelocityPublisher implements EventHandler, PublisherService {
 

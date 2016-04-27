@@ -3,7 +3,7 @@ package no.ntnu.item.its.osgi.publishers.color;
 import java.util.HashMap;
 import java.util.Map;
 
-import no.ntnu.item.its.osgi.sensors.common.enums.EColor;
+import no.ntnu.item.its.osgi.common.enums.EColor;
 
 public class ColorMapping {
 	

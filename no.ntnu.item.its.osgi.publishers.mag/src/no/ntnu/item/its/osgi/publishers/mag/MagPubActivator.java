@@ -1,13 +1,16 @@
 package no.ntnu.item.its.osgi.publishers.mag;
 
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceFactory;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
-import no.ntnu.item.its.osgi.sensors.common.interfaces.AccelerationControllerService;
-import no.ntnu.item.its.osgi.sensors.common.interfaces.MagControllerService;
+import no.ntnu.item.its.osgi.common.interfaces.AccelerationControllerService;
+import no.ntnu.item.its.osgi.common.interfaces.MagControllerService;
 
 public class MagPubActivator implements BundleActivator {
 

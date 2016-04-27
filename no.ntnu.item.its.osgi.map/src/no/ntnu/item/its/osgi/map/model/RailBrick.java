@@ -7,16 +7,22 @@ public class RailBrick implements RailComponent {
 	private RailComponentId id;
 	private final RailLeg parentLeg;
 	private final int sleepers;
+	private BrickType brickType;
 	
 	public RailBrick(String id, RailLeg parent, BrickType brickType) {
 		this.id = new RailComponentId(id);
 		parentLeg = parent;
+		this.brickType = brickType;
 		if (brickType == BrickType.CURVED || brickType == BrickType.STRAIGHT) {
 			this.sleepers = 4;
 		}
 		else {
 			this.sleepers = 10000;
 		}
+	}
+	
+	public BrickType getType() {
+		return brickType;
 	}
 	
 	public RailLeg parentLeg(){

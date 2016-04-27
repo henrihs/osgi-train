@@ -11,19 +11,19 @@ import org.osgi.service.event.EventAdmin;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
-import no.ntnu.item.its.osgi.sensors.common.enums.PublisherType;
-import no.ntnu.item.its.osgi.sensors.common.enums.Status;
-import no.ntnu.item.its.osgi.sensors.common.exceptions.SensorCommunicationException;
-import no.ntnu.item.its.osgi.sensors.common.interfaces.MagControllerService;
-import no.ntnu.item.its.osgi.sensors.common.interfaces.PublisherService;
-import no.ntnu.item.its.osgi.sensors.common.interfaces.SensorSchedulerService;
-import no.ntnu.item.its.osgi.sensors.common.servicetrackers.SchedulerTrackerCustomizer;
+import no.ntnu.item.its.osgi.common.enums.PublisherType;
+import no.ntnu.item.its.osgi.common.enums.Status;
+import no.ntnu.item.its.osgi.common.exceptions.SensorCommunicationException;
+import no.ntnu.item.its.osgi.common.interfaces.MagControllerService;
+import no.ntnu.item.its.osgi.common.interfaces.PublisherService;
+import no.ntnu.item.its.osgi.common.interfaces.SensorSchedulerService;
+import no.ntnu.item.its.osgi.common.servicetrackers.SchedulerTrackerCustomizer;
 
 public class MagPublisher implements PublisherService {
 
 	public static final PublisherType TYPE = PublisherType.MAG;
 	
-	public static final long SCHEDULE_PERIOD = 50;
+	public static final long SCHEDULE_PERIOD = 200;
 
 	private Function<Void, Void> sensorReading;
 	private double[] previous;

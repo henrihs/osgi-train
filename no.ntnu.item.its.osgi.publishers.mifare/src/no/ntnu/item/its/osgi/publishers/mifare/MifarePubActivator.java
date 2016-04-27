@@ -5,7 +5,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
-import no.ntnu.item.its.osgi.sensors.common.interfaces.MifareControllerService;
+
+import no.ntnu.item.its.osgi.common.interfaces.MifareControllerService;
 
 public class MifarePubActivator implements BundleActivator {
 	private static BundleContext context;

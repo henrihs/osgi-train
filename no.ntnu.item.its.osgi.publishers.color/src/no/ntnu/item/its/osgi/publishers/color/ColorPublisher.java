@@ -11,18 +11,18 @@ import org.osgi.service.event.EventAdmin;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
-import no.ntnu.item.its.osgi.sensors.common.enums.EColor;
-import no.ntnu.item.its.osgi.sensors.common.enums.PublisherType;
-import no.ntnu.item.its.osgi.sensors.common.enums.Status;
-import no.ntnu.item.its.osgi.sensors.common.exceptions.SensorCommunicationException;
-import no.ntnu.item.its.osgi.sensors.common.interfaces.ColorControllerService;
-import no.ntnu.item.its.osgi.sensors.common.interfaces.PublisherService;
-import no.ntnu.item.its.osgi.sensors.common.interfaces.SensorSchedulerService;
-import no.ntnu.item.its.osgi.sensors.common.servicetrackers.SchedulerTrackerCustomizer;
+import no.ntnu.item.its.osgi.common.enums.EColor;
+import no.ntnu.item.its.osgi.common.enums.PublisherType;
+import no.ntnu.item.its.osgi.common.enums.Status;
+import no.ntnu.item.its.osgi.common.exceptions.SensorCommunicationException;
+import no.ntnu.item.its.osgi.common.interfaces.ColorControllerService;
+import no.ntnu.item.its.osgi.common.interfaces.PublisherService;
+import no.ntnu.item.its.osgi.common.interfaces.SensorSchedulerService;
+import no.ntnu.item.its.osgi.common.servicetrackers.SchedulerTrackerCustomizer;
 
 public class ColorPublisher implements PublisherService {
 	
-	public static final long SCHEDULE_PERIOD = 1000;
+	public static final long SCHEDULE_PERIOD = 50;
 	private static final PublisherType TYPE = PublisherType.SLEEPER;
 	
 	private EColor lastPublishedColor;

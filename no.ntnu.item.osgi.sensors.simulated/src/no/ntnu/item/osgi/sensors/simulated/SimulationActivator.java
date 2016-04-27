@@ -6,12 +6,12 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 
+import no.ntnu.item.its.osgi.common.enums.SensorNature;
+import no.ntnu.item.its.osgi.common.interfaces.AccelerationControllerService;
+import no.ntnu.item.its.osgi.common.interfaces.ColorControllerService;
+import no.ntnu.item.its.osgi.common.interfaces.MifareControllerService;
 import no.ntnu.item.its.osgi.sensors.accel.AccelerationControllerMocker;
 import no.ntnu.item.its.osgi.sensors.color.ColorControllerMocker;
-import no.ntnu.item.its.osgi.sensors.common.enums.SensorNature;
-import no.ntnu.item.its.osgi.sensors.common.interfaces.AccelerationControllerService;
-import no.ntnu.item.its.osgi.sensors.common.interfaces.ColorControllerService;
-import no.ntnu.item.its.osgi.sensors.common.interfaces.MifareControllerService;
 import no.ntnu.item.its.osgi.sensors.mifare.MifareControllerMocker;
 
 public class SimulationActivator implements BundleActivator {

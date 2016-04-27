@@ -9,7 +9,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogService;
 
-import no.ntnu.item.its.osgi.sensors.common.interfaces.SensorSchedulerService;
+import no.ntnu.item.its.osgi.common.interfaces.SensorSchedulerService;
 
 public class SchedulerServiceImpl implements BundleActivator, SensorSchedulerService {
 

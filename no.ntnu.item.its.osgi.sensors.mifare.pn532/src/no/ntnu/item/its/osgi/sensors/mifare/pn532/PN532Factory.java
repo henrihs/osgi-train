@@ -2,7 +2,7 @@ package no.ntnu.item.its.osgi.sensors.mifare.pn532;
 
 import java.io.IOException;
 
-import no.ntnu.item.its.osgi.sensors.common.exceptions.SensorInitializationException;
+import no.ntnu.item.its.osgi.common.exceptions.SensorInitializationException;
 
 public class PN532Factory {
 	
