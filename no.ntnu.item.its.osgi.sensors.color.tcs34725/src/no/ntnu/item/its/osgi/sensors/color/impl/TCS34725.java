@@ -181,10 +181,10 @@ public class TCS34725 implements ColorControllerService
 		int g;
 		int c;
 		try {
-			r = this.readU16(TCS34725_RDATAL) / 255;
-			b = this.readU16(TCS34725_BDATAL) / 255;
-			g = this.readU16(TCS34725_GDATAL) / 255;
-			c = this.readU16(TCS34725_CDATAL) / 255;
+			r = this.readU16(TCS34725_RDATAL);
+			b = this.readU16(TCS34725_BDATAL);
+			g = this.readU16(TCS34725_GDATAL);
+			c = this.readU16(TCS34725_CDATAL);
 		} catch (IOException e) {
 			throw new SensorCommunicationException("Communication failure", e);
 		}

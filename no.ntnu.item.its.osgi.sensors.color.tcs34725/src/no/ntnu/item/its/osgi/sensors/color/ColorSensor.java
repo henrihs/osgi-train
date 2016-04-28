@@ -31,8 +31,9 @@ public class ColorSensor implements BundleActivator {
 		Runnable r = new Runnable() {
 			public void run() {
 				try {
-					ColorControllerService ccs = new TCS34725(Constants.TCS34725_ADDRESS,
+					TCS34725 ccs = new TCS34725(Constants.TCS34725_ADDRESS,
 							Constants.TCS34725_INTEGRATIONTIME_2_4MS);
+					ccs.setIntegrationTime(Constants.TCS34725_INTEGRATIONTIME_2_4MS);
 					Hashtable<String, Object> props = new Hashtable<String, Object>();
 					props.put(SensorNature.PROPERTY_KEY, SensorNature.PHYSICAL);
 					props.put(org.osgi.framework.Constants.SERVICE_RANKING, SensorNature.PHYSICAL.ordinal());

@@ -8,48 +8,63 @@ import java.util.function.Function;
 import org.osgi.framework.BundleException;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
+import org.osgi.service.event.EventConstants;
+import org.osgi.service.event.EventHandler;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
 import no.ntnu.item.its.osgi.common.MifareKeyRing;
+import no.ntnu.item.its.osgi.common.enums.EColor;
 import no.ntnu.item.its.osgi.common.enums.MifareKeyType;
 import no.ntnu.item.its.osgi.common.enums.PublisherType;
 import no.ntnu.item.its.osgi.common.enums.Status;
 import no.ntnu.item.its.osgi.common.exceptions.NoCardFoundException;
 import no.ntnu.item.its.osgi.common.exceptions.SensorCommunicationException;
+import no.ntnu.item.its.osgi.common.interfaces.AccelerationControllerService;
+import no.ntnu.item.its.osgi.common.interfaces.ActuatorControllerService;
+import no.ntnu.item.its.osgi.common.interfaces.ColorControllerService;
+import no.ntnu.item.its.osgi.common.interfaces.MagControllerService;
 import no.ntnu.item.its.osgi.common.interfaces.MifareControllerService;
 import no.ntnu.item.its.osgi.common.interfaces.PublisherService;
 import no.ntnu.item.its.osgi.common.interfaces.SensorSchedulerService;
+import no.ntnu.item.its.osgi.common.interfaces.VelocityControllerService;
 import no.ntnu.item.its.osgi.common.servicetrackers.SchedulerTrackerCustomizer;
 
-public class MifarePublisher implements PublisherService {
+public class MifarePublisher implements PublisherService, EventHandler {
 
-	public static final long SCHEDULE_PERIOD = 30;
-	public static final long SLEEP_AFTER_PUBLISH_TIME = 1500;
+//	public static final long SCHEDULE_PERIOD = 30;
+//	public static final long SLEEP_AFTER_PUBLISH_TIME = 1500;
 	private static final PublisherType TYPE = PublisherType.BEACON;
 	
 	private Function<Void, Void> sensorReading;
 	
 	public MifarePublisher() {
 		sensorReading = getSensorReadingFunc();
-		Runnable runnableSensorReading = new Runnable() {
-			@Override
-			public void run() {
-				sensorReading.apply(null);
-			}
-		};
+//		Runnable runnableSensorReading = new Runnable() {
+//			@Override
+//			public void run() {
+//				sensorReading.apply(null);
+//			}
+//		};
 
-		ServiceTracker<SensorSchedulerService, Object> schedulerTracker = 
-				new ServiceTracker<SensorSchedulerService, Object>(
-						MifarePubActivator.getContext(), 
-						SensorSchedulerService.class, 
-						new SchedulerTrackerCustomizer(
-								MifarePubActivator.getContext(), runnableSensorReading, SCHEDULE_PERIOD));
-		schedulerTracker.open();
+//		ServiceTracker<SensorSchedulerService, Object> schedulerTracker = 
+//				new ServiceTracker<SensorSchedulerService, Object>(
+//						MifarePubActivator.getContext(), 
+//						SensorSchedulerService.class, 
+//						new SchedulerTrackerCustomizer(
+//								MifarePubActivator.getContext(), runnableSensorReading, SCHEDULE_PERIOD));
+//		schedulerTracker.open();
+		String[] topics = new String[] { 
+				ColorControllerService.EVENT_TOPIC
+		};
+		Hashtable<String, Object> handlerProps = new Hashtable<String, Object>();
+		handlerProps.put(EventConstants.EVENT_TOPIC, topics);
+		MifarePubActivator.getContext().registerService(EventHandler.class.getName(), this, handlerProps);
 		
 		Dictionary<String, Object> serviceProps = new Hashtable<String, Object>();
 		serviceProps.put(PublisherType.class.getSimpleName(), TYPE);
 		MifarePubActivator.getContext().registerService(PublisherService.class, this, serviceProps);
+		
 	}
 	
 	@Override
@@ -87,7 +102,7 @@ public class MifarePublisher implements PublisherService {
 								"Passed beacon with empty location information");
 					}
 					
-					Thread.sleep(SLEEP_AFTER_PUBLISH_TIME);
+//					Thread.sleep(SLEEP_AFTER_PUBLISH_TIME);
 				} catch (NoCardFoundException e) {
 				} catch (SensorCommunicationException e) {
 					((LogService)MifarePubActivator.logServiceTracker.getService()).log(
@@ -129,6 +144,20 @@ public class MifarePublisher implements PublisherService {
 			((LogService) MifarePubActivator.logServiceTracker.getService()).log(
 					LogService.LOG_INFO, "Failed to publish event, no EventAdmin service available!");
 		}
+	}
+
+	@Override
+	public void handleEvent(Event arg0) {
+		Runnable r = new Runnable() {
+			
+			@Override
+			public void run() {
+				if (arg0.getProperty(ColorControllerService.COLOR_KEY) == EColor.BLUE) {
+					sensorReading.apply(null);
+				}				
+			}
+		};
+		new Thread(r).start();
 	}
 
 }

@@ -82,8 +82,8 @@ public class ColorPublisher implements PublisherService {
 			Map<String, EColor> properties = new Hashtable<>();
 			properties.put(ColorControllerService.COLOR_KEY, color);
 			Event colorEvent = new Event(ColorControllerService.EVENT_TOPIC, properties);			
-//			((EventAdmin) ColorPubActivator.eventAdminTracker.getService()).postEvent(colorEvent);
-			System.out.println(color);
+			((EventAdmin) ColorPubActivator.eventAdminTracker.getService()).postEvent(colorEvent);
+//			System.out.println(color);
 			lastPublishedColor = color;
 		}
 		
