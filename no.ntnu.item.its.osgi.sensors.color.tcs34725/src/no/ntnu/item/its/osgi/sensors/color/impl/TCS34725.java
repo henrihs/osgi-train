@@ -54,10 +54,10 @@ public class TCS34725 implements ColorControllerService
 	@Override
 	public int[] getRawData() throws SensorCommunicationException
 	{
-		int c = this.readU16(Constants.TCS34725_CDATAL);
-		int r = this.readU16(Constants.TCS34725_RDATAL);
-		int g = this.readU16(Constants.TCS34725_GDATAL);
-		int b = this.readU16(Constants.TCS34725_BDATAL);
+		int c = this.readU16(Constants.TCS34725_CDATAL) / 255;
+		int r = this.readU16(Constants.TCS34725_RDATAL) / 255;
+		int g = this.readU16(Constants.TCS34725_GDATAL) / 255;
+		int b = this.readU16(Constants.TCS34725_BDATAL) / 255;
 		waitfor((long)(Constants.INTEGRATION_TIME_DELAY.get(this.integrationTime) / 1000L));
 		return new int[] {c, r, g, b};
 	}

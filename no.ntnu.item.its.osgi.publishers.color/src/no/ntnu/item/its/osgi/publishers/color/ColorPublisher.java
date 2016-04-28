@@ -22,7 +22,7 @@ import no.ntnu.item.its.osgi.common.servicetrackers.SchedulerTrackerCustomizer;
 
 public class ColorPublisher implements PublisherService {
 	
-	public static final long SCHEDULE_PERIOD = 50;
+	public static final long SCHEDULE_PERIOD = 15;
 	private static final PublisherType TYPE = PublisherType.SLEEPER;
 	
 	private EColor lastPublishedColor;
@@ -75,7 +75,8 @@ public class ColorPublisher implements PublisherService {
 			Map<String, EColor> properties = new Hashtable<>();
 			properties.put(ColorControllerService.COLOR_KEY, color);
 			Event colorEvent = new Event(ColorControllerService.EVENT_TOPIC, properties);			
-			((EventAdmin) ColorPubActivator.eventAdminTracker.getService()).postEvent(colorEvent);
+//			((EventAdmin) ColorPubActivator.eventAdminTracker.getService()).postEvent(colorEvent);
+			System.out.println(color);
 			lastPublishedColor = color;
 		}
 		

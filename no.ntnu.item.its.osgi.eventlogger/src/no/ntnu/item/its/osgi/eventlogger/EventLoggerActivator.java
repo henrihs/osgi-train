@@ -82,36 +82,44 @@ public class EventLoggerActivator implements BundleActivator, EventHandler {
 
 	@Override
 	public void handleEvent(Event arg0) {
-		if (arg0.getTopic().equals(ColorControllerService.EVENT_TOPIC)) {
-			System.out.println(ColorControllerService.COLOR_KEY + ": " + arg0.getProperty(ColorControllerService.COLOR_KEY));
-		} 
-		else if (arg0.getTopic().equals(MifareControllerService.EVENT_TOPIC)) {
-			System.out.println(MifareControllerService.LOC_ID_KEY + ": " + arg0.getProperty(MifareControllerService.LOC_ID_KEY));
-		}
-		else if (arg0.getTopic().equals(AccelerationControllerService.EVENT_TOPIC)) {
-			accelWriter.println(
-					(long)arg0.getProperty(AccelerationControllerService.TIMESTAMP_KEY)*1E-9 + ", " +
-					arg0.getProperty(AccelerationControllerService.X_DATA_KEY));
-		}
-		else if (arg0.getTopic().equals(VelocityControllerService.EVENT_TOPIC)) {
-			velocityWriter.println(
-					(long)arg0.getProperty(VelocityControllerService.TIMESTAMP_KEY)*1E-9 + ", " +
-					arg0.getProperty(VelocityControllerService.VX_KEY));
-		}
-		else if (arg0.getTopic().equals(ActuatorControllerService.EVENT_TOPIC)) {
-			commandWriter.println(
-					((long)arg0.getProperty(ActuatorControllerService.TIMESTAMP_KEY)-1)*1E-9 + ", " +
-					arg0.getProperty(ActuatorControllerService.PREV_STATE_KEY));
+		Runnable r = new Runnable() {
 			
-			commandWriter.println(
-					(long)arg0.getProperty(ActuatorControllerService.TIMESTAMP_KEY)*1E-9 + ", " +
-					arg0.getProperty(ActuatorControllerService.NEXT_STATE_KEY));
-		}
-		else if (arg0.getTopic().equals(MagControllerService.EVENT_TOPIC)) {
-			headingWriter.println(
-					(long)arg0.getProperty(MagControllerService.TIMESTAMP_KEY)*1E-9 + ", " + 
-					arg0.getProperty(MagControllerService.HEADING_KEY));
-		}
+			@Override
+			public void run() {
+				if (arg0.getTopic().equals(ColorControllerService.EVENT_TOPIC)) {
+					System.out.println(ColorControllerService.COLOR_KEY + ": " + arg0.getProperty(ColorControllerService.COLOR_KEY));
+				} 
+				else if (arg0.getTopic().equals(MifareControllerService.EVENT_TOPIC)) {
+					System.out.println(MifareControllerService.LOC_ID_KEY + ": " + arg0.getProperty(MifareControllerService.LOC_ID_KEY));
+				}
+				else if (arg0.getTopic().equals(AccelerationControllerService.EVENT_TOPIC)) {
+					accelWriter.println(
+							(long)arg0.getProperty(AccelerationControllerService.TIMESTAMP_KEY)*1E-9 + ", " +
+							arg0.getProperty(AccelerationControllerService.X_DATA_KEY));
+				}
+				else if (arg0.getTopic().equals(VelocityControllerService.EVENT_TOPIC)) {
+					velocityWriter.println(
+							(long)arg0.getProperty(VelocityControllerService.TIMESTAMP_KEY)*1E-9 + ", " +
+							arg0.getProperty(VelocityControllerService.VX_KEY));
+				}
+				else if (arg0.getTopic().equals(ActuatorControllerService.EVENT_TOPIC)) {
+					commandWriter.println(
+							((long)arg0.getProperty(ActuatorControllerService.TIMESTAMP_KEY)-1)*1E-9 + ", " +
+							arg0.getProperty(ActuatorControllerService.PREV_STATE_KEY));
+					
+					commandWriter.println(
+							(long)arg0.getProperty(ActuatorControllerService.TIMESTAMP_KEY)*1E-9 + ", " +
+							arg0.getProperty(ActuatorControllerService.NEXT_STATE_KEY));
+				}
+				else if (arg0.getTopic().equals(MagControllerService.EVENT_TOPIC)) {
+					headingWriter.println(
+							(long)arg0.getProperty(MagControllerService.TIMESTAMP_KEY)*1E-9 + ", " + 
+							arg0.getProperty(MagControllerService.HEADING_KEY));
+				}
+				
+			}
+		};
+		new Thread(r).start();
 	}
 }
 

@@ -1,13 +1,14 @@
 package no.ntnu.item.its.osgi.publishers.color;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 import no.ntnu.item.its.osgi.common.enums.EColor;
 
 public class ColorMapping {
 	
-	private static final Map<EColor,int[]> FIXED_COLORS;
+	static final Map<EColor,int[]> FIXED_COLORS;
 	static {
 		 FIXED_COLORS = new HashMap<EColor, int[]>();
 		 FIXED_COLORS.put(EColor.GREEN, new int[] {36, 7, 18, 11});
@@ -52,12 +53,15 @@ public class ColorMapping {
 	}
 	
 	public double compareWith(int[] rawColor) {
-		
-		int redDiff = componentFromRaw(clearValue, redValue) - componentFromRaw(rawColor[0], rawColor[1]);
-		int greenDiff = componentFromRaw(clearValue, greenValue) - componentFromRaw(rawColor[0], rawColor[2]);
-		int blueDiff = componentFromRaw(clearValue, blueValue) - componentFromRaw(rawColor[0], rawColor[3]);
-		  
-		return redDiff*redDiff + greenDiff*greenDiff + blueDiff*blueDiff;
+		int clearDiff = Math.abs(clearValue-rawColor[0]);
+		int redDiff = Math.abs(redValue-rawColor[1]);
+		int greenDiff = Math.abs(greenValue-rawColor[2]);
+		int blueDiff = Math.abs(blueValue-rawColor[3]);
+//		int redDiff = componentFromRaw(clearValue, redValue) - componentFromRaw(rawColor[0], rawColor[1]);
+//		int greenDiff = componentFromRaw(clearValue, greenValue) - componentFromRaw(rawColor[0], rawColor[2]);
+//		int blueDiff = componentFromRaw(clearValue, blueValue) - componentFromRaw(rawColor[0], rawColor[3]);
+//		  
+		return clearDiff + redDiff + greenDiff + blueDiff;
 	}
 	
 	private int componentFromRaw(int clear, int color) {

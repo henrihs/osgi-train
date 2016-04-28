@@ -260,7 +260,7 @@ public class TCS34725
       while (i < 100) {
     	  int[] rgb = sensor.getRawData();
     	  
-    	  System.out.println(rgb);
+    	  System.out.println(rgb.toString());
       }
       
       sensor.disable();
