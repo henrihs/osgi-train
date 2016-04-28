@@ -104,9 +104,9 @@ public class ColorPublisher implements PublisherService {
 				try {
 					ColorControllerService ccs = (ColorControllerService) ColorPubActivator.colorControllerTracker.getService();
 					int[] rawColor = ccs.getRawData();
-					long now = System.nanoTime();
-					if (last != 0) {colorWriter.println(String.format("%f",(now-last)*1E-9));}
-					last = now;
+//					long now = System.nanoTime();
+//					if (last != 0) {colorWriter.println(String.format("%f",(now-last)*1E-9));}
+//					last = now;
 					if (rawColor != null) {
 						EColor color = ColorClassifier.colorApproximation(rawColor);
 						publish(color);
