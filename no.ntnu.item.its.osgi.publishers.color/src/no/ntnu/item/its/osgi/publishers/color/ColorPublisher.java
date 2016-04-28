@@ -1,5 +1,8 @@
 package no.ntnu.item.its.osgi.publishers.color;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Map;
@@ -27,6 +30,7 @@ public class ColorPublisher implements PublisherService {
 	
 	private EColor lastPublishedColor;
 
+	PrintWriter colorWriter;
 
 	private Function<Void, Void> sensorReading;
 
@@ -40,11 +44,14 @@ public class ColorPublisher implements PublisherService {
 	public PublisherType getType() {
 		return TYPE;
 	}
+	
 
-	public ColorPublisher() {
+	public ColorPublisher() throws FileNotFoundException, UnsupportedEncodingException {
+		colorWriter = new PrintWriter("color_" + System.currentTimeMillis() + ".csv", "UTF-8");
 		sensorReading = getSensorReadingFunc();
 		Runnable runnableSensorReading = new Runnable() {
 
+			
 			@Override
 			public void run() {
 				sensorReading.apply(null);
@@ -87,14 +94,19 @@ public class ColorPublisher implements PublisherService {
 		}
 	}
 
-	private Function<Void, Void> getSensorReadingFunc() {
+	private Function<Void, Void> getSensorReadingFunc() throws FileNotFoundException, UnsupportedEncodingException {
 		return new Function<Void, Void>() {
+			
+			long last = 0; 
 			
 			@Override
 			public Void apply(Void t) {
 				try {
 					ColorControllerService ccs = (ColorControllerService) ColorPubActivator.colorControllerTracker.getService();
 					int[] rawColor = ccs.getRawData();
+					long now = System.nanoTime();
+					if (last != 0) {colorWriter.println(String.format("%f",(now-last)*1E-9));}
+					last = now;
 					if (rawColor != null) {
 						EColor color = ColorClassifier.colorApproximation(rawColor);
 						publish(color);
@@ -118,6 +130,7 @@ public class ColorPublisher implements PublisherService {
 	}
 
 	public void stop() {
+		colorWriter.close();
 		sensorReading = null;
 	}
 
