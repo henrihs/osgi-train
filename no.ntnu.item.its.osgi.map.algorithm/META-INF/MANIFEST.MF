@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Algorithms
+Bundle-SymbolicName: no.ntnu.item.its.osgi.map.algorithms
+Bundle-Version: 1.0.0
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Import-Package: no.ntnu.item.its.osgi.common.exceptions,
+ no.ntnu.item.its.osgi.map.model
+Export-Package: no.ntnu.item.its.osgi.map.algorithm

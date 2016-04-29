@@ -40,7 +40,7 @@ public class ColorClassifier {
 		}
 
 		if (minEntry > 20) { // Don't make too approximated approximations!
-			return null;
+			return EColor.UNKNOWN;
 		}
 
 		return minColor;

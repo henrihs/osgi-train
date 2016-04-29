@@ -28,7 +28,7 @@ public class ColorPublisher implements PublisherService {
 	public static final long SCHEDULE_PERIOD = 15;
 	private static final PublisherType TYPE = PublisherType.SLEEPER;
 	
-	private EColor lastPublishedColor;
+	private EColor lastRegisteredColor;
 
 	PrintWriter colorWriter;
 
@@ -74,7 +74,12 @@ public class ColorPublisher implements PublisherService {
 	}
 	
 	private void publish(EColor color){
-		if (color == null || color.equals(lastPublishedColor)) {
+		if (color == null || color.equals(lastRegisteredColor)) {
+			return;
+		}
+		
+		if (color == EColor.UNKNOWN) {
+			lastRegisteredColor = color;
 			return;
 		}
 		
@@ -84,12 +89,12 @@ public class ColorPublisher implements PublisherService {
 			Event colorEvent = new Event(ColorControllerService.EVENT_TOPIC, properties);			
 			((EventAdmin) ColorPubActivator.eventAdminTracker.getService()).postEvent(colorEvent);
 //			System.out.println(color);
-			lastPublishedColor = color;
+			lastRegisteredColor = color;
 		}
 		
 		else if (!ColorPubActivator.logServiceTracker.isEmpty()) {
 		((LogService) ColorPubActivator.logServiceTracker.getService()).log(
-				LogService.LOG_DEBUG, 
+				LogService.LOG_ERROR, 
 				"Failed to publish event, no EventAdmin service available!");
 		}
 	}
@@ -97,7 +102,7 @@ public class ColorPublisher implements PublisherService {
 	private Function<Void, Void> getSensorReadingFunc() throws FileNotFoundException, UnsupportedEncodingException {
 		return new Function<Void, Void>() {
 			
-			long last = 0; 
+//			long last = 0;
 			
 			@Override
 			public Void apply(Void t) {

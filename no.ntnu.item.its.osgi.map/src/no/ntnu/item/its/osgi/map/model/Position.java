@@ -1,7 +1,5 @@
 package no.ntnu.item.its.osgi.map.model;
 
-import java.util.LinkedList;
-
 import bluebrick4j.model.BrickType;
 
 import java.util.ArrayList;
@@ -37,50 +35,95 @@ public class Position implements Iterable<RailComponent> {
 		return null;
 	}
 	
-	public RailComponent tryMoveToNextStraight() {
-		RailComponent straightAhead = null;
-		boolean reachedTurn = false;
-		while (!reachedTurn) {
-			straightAhead = lookAhead(direction);
+	public boolean tryMoveToNextStraight() {
+		RailComponent straightAhead = head();
+		boolean straightInSight = false;
+		while (!straightInSight) {
+			straightAhead = straightAhead.lookAhead(direction);
 			if (straightAhead instanceof RailBrick && ((RailBrick) straightAhead).getType() == BrickType.STRAIGHT) {
-				reachedTurn = true;
+				straightInSight = true;
 			} else if (straightAhead instanceof PointConnector) {
 				break;
 			}
 		}
 		
-		if (!reachedTurn) {
-			return null;
+		if (!straightInSight) {
+			return false;
 		}
 		
 		while (head() != straightAhead ) {
 			move();
 		}
 		
-		return head();
+		return true;
 	}
 	
-	public RailComponent tryMoveToNextTurn() {
-		RailComponent turnAhead = null;
-		boolean reachedTurn = false;
-		while (!reachedTurn) {
-			turnAhead = lookAhead(direction);
+	public boolean tryMoveToNextTurn() {
+		RailComponent turnAhead = head();
+		boolean turnInSight = false;
+		while (!turnInSight) {
+			turnAhead = turnAhead.lookAhead(direction);
 			if (turnAhead instanceof RailBrick && ((RailBrick) turnAhead).getType() == BrickType.CURVED) {
-				reachedTurn = true;
+				turnInSight = true;
 			} else if (turnAhead instanceof PointConnector) {
 				break;
 			}
 		}
 		
-		if (!reachedTurn) {
-			return null;
+		if (!turnInSight) {
+			return false;
 		}
 		
 		while (head() != turnAhead ) {
 			move();
 		}
 		
-		return head();
+		return true;
+	}
+	
+	public boolean tryMoveToNextPoint() {
+		Point pointAhead = (Point)direction.getLockableResource();
+		
+		while (!headIsInPointSwitch()) {
+			move();
+		}
+		
+		if (!head().id().equals(pointAhead.id())) {
+			return false;
+		}
+		
+		return true;
+	}
+	
+	public boolean moveToEndOfLeg() {
+		if (!(head() instanceof RailBrick)) {
+			return false;
+		}
+		
+		boolean endReached = false;
+		while (!endReached) {
+			if (lookAhead(direction) instanceof PointConnector) { endReached = true; }
+			else { move(); }
+		}
+		
+		return true;
+	}
+	
+	public boolean moveTo(RailComponentId id) {
+		RailComponent componentAhead = head();
+		boolean reachedComponent = false;
+		while (!reachedComponent) {
+			componentAhead = componentAhead.lookAhead(direction);
+			if (componentAhead.id().equals(id)) {
+				reachedComponent = true;
+			}
+		}
+		
+		while (head() != componentAhead) {
+			move();
+		}
+		
+		return true;
 	}
 	
 	public RailComponent move() {
