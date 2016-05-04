@@ -14,7 +14,8 @@ import no.ntnu.item.its.osgi.common.interfaces.ActuatorControllerService;
 
 public class ActuatorControllerImpl implements ActuatorControllerService {
 
-	private static final int SPEED_STEP_SLEEP_TIME = 2;
+	private static final int SPEED_STEP_SLEEP_TIME = 20;
+	private int increment = 10;
 	private PWMDevice pwm;
 	private DcMotor motor;
 	private MotorCommand previousState = MotorCommand.STOP;
@@ -46,7 +47,7 @@ public class ActuatorControllerImpl implements ActuatorControllerService {
 					synchronized (motor) {						
 						publish(command);
 						if (command == MotorCommand.STOP) {
-							for (int i = 149; i >= 0; i--) {
+							for (int i = currentSpeed; i >= 0; i--) {
 								motor.setSpeed(i);
 								Thread.sleep(SPEED_STEP_SLEEP_TIME);
 							}
@@ -84,28 +85,32 @@ public class ActuatorControllerImpl implements ActuatorControllerService {
 			public void run() {
 				try {
 					synchronized(motor) {
+						
 						if (command == MotorCommand.STOP) {
-							for (int i = currentSpeed; i >= 0; i--) {
+							for (int i = currentSpeed; i >= 0; i-= increment) {
 								motor.setSpeed(i);
 								Thread.sleep(SPEED_STEP_SLEEP_TIME);
-							}
+							} 
+							if(speed%increment != 0)  motor.setSpeed(0);
+							currentSpeed = 0;
 						} else {
 							motor.setDirection(command);
 							if (speed < currentSpeed) {
-								for (int i = currentSpeed; i >= speed; i--) {
+								for (int i = currentSpeed; i >= speed; i-= increment) {
 									motor.setSpeed(i);
 									Thread.sleep(SPEED_STEP_SLEEP_TIME);
 								}
 							}
 							else if (speed > currentSpeed) {
-								for (int i = currentSpeed; i <= speed; i++) {
+								for (int i = currentSpeed; i <= speed; i += increment) {
 									motor.setSpeed(i);
 									Thread.sleep(SPEED_STEP_SLEEP_TIME);
 								}
 							}
-
+							if(speed%increment != 0) motor.setSpeed(speed);
+							currentSpeed = speed;
 						}
-					}
+					} 
 				} catch (Exception e) {
 					// TODO: handle exception
 				}
@@ -172,4 +177,5 @@ public class ActuatorControllerImpl implements ActuatorControllerService {
 			e.printStackTrace();
 		}
 	}
+
 }

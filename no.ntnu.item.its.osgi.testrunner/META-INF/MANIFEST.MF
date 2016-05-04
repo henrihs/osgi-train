@@ -9,4 +9,5 @@ Import-Package: no.ntnu.item.its.osgi.eventlogger,
  no.ntnu.item.its.osgi.publishers.accel,
  no.ntnu.item.its.osgi.publishers.speed,
  no.ntnu.item.osgi.sensors.simulated,
+ no.ntnu.item.osgi.train.system.system,
  org.osgi.framework;version="1.3.0"

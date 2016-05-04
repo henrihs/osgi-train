@@ -160,4 +160,15 @@ public class MifarePublisher implements PublisherService, EventHandler {
 		new Thread(r).start();
 	}
 
+	@Override
+	public void setPublishRate(long rate) {
+		// TODO: dasd
+	}
+
+	@Override
+	public void stopPublisher() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

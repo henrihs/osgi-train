@@ -25,12 +25,15 @@ import no.ntnu.item.its.osgi.common.servicetrackers.SchedulerTrackerCustomizer;
 
 public class ColorPublisher implements PublisherService {
 	
-	public static final long SCHEDULE_PERIOD = 15;
+	public static final long  SCHEDULE_PERIOD = 15;
 	private static final PublisherType TYPE = PublisherType.SLEEPER;
+	
+	ServiceTracker<SensorSchedulerService, SensorSchedulerService> schedulerTracker;
+	Runnable runnableSensorReading;
 	
 	private EColor lastRegisteredColor;
 
-	PrintWriter colorWriter;
+//	PrintWriter colorWriter;
 
 	private Function<Void, Void> sensorReading;
 
@@ -47,9 +50,16 @@ public class ColorPublisher implements PublisherService {
 	
 
 	public ColorPublisher() throws FileNotFoundException, UnsupportedEncodingException {
-		colorWriter = new PrintWriter("color_" + System.currentTimeMillis() + ".csv", "UTF-8");
+//		colorWriter = new PrintWriter("color_" + System.currentTimeMillis() + ".csv", "UTF-8");
+		addRunnableToScheduler();
+		Dictionary<String, Object> serviceProps = new Hashtable<String, Object>();
+		serviceProps.put(PublisherType.class.getSimpleName(), TYPE);
+		ColorPubActivator.getContext().registerService(PublisherService.class, this, serviceProps);
+	}
+	
+	private void addRunnableToScheduler() throws FileNotFoundException, UnsupportedEncodingException{
 		sensorReading = getSensorReadingFunc();
-		Runnable runnableSensorReading = new Runnable() {
+		runnableSensorReading = new Runnable() {
 
 			
 			@Override
@@ -58,8 +68,8 @@ public class ColorPublisher implements PublisherService {
 			}
 		};
 
-		ServiceTracker<SensorSchedulerService, Object> schedulerTracker = 
-				new ServiceTracker<SensorSchedulerService, Object>(
+		schedulerTracker = 
+				new ServiceTracker<SensorSchedulerService, SensorSchedulerService>(
 						ColorPubActivator.getContext(), 
 						SensorSchedulerService.class, 
 						new SchedulerTrackerCustomizer(
@@ -68,9 +78,7 @@ public class ColorPublisher implements PublisherService {
 								SCHEDULE_PERIOD));
 		schedulerTracker.open();
 		
-		Dictionary<String, Object> serviceProps = new Hashtable<String, Object>();
-		serviceProps.put(PublisherType.class.getSimpleName(), TYPE);
-		ColorPubActivator.getContext().registerService(PublisherService.class, this, serviceProps);
+		
 	}
 	
 	private void publish(EColor color){
@@ -88,7 +96,6 @@ public class ColorPublisher implements PublisherService {
 			properties.put(ColorControllerService.COLOR_KEY, color);
 			Event colorEvent = new Event(ColorControllerService.EVENT_TOPIC, properties);			
 			((EventAdmin) ColorPubActivator.eventAdminTracker.getService()).postEvent(colorEvent);
-//			System.out.println(color);
 			lastRegisteredColor = color;
 		}
 		
@@ -108,6 +115,7 @@ public class ColorPublisher implements PublisherService {
 			public Void apply(Void t) {
 				try {
 					ColorControllerService ccs = (ColorControllerService) ColorPubActivator.colorControllerTracker.getService();
+					if(ccs == null) return t;
 					int[] rawColor = ccs.getRawData();
 //					long now = System.nanoTime();
 //					if (last != 0) {colorWriter.println(String.format("%f",(now-last)*1E-9));}
@@ -135,8 +143,33 @@ public class ColorPublisher implements PublisherService {
 	}
 
 	public void stop() {
-		colorWriter.close();
+//		colorWriter.close();
 		sensorReading = null;
+	}
+
+	private void stopScheduledTask(){
+		SensorSchedulerService scheduler = schedulerTracker.getService();
+		if(scheduler == null)return;
+		scheduler.remove(runnableSensorReading, false);
+	}
+	
+	private void startScheduledTask(long rate){
+		SensorSchedulerService scheduler = schedulerTracker.getService();
+		if(scheduler == null)return;
+		scheduler.add(runnableSensorReading, 0, rate);
+	}
+	
+	@Override
+	public void setPublishRate(long rate) {
+		stopScheduledTask();
+		startScheduledTask(rate);
+	}
+
+	@Override
+	public void stopPublisher() {
+		stopScheduledTask();
+		//TODO: STOP BUNDLE
+		
 	}
 
 }

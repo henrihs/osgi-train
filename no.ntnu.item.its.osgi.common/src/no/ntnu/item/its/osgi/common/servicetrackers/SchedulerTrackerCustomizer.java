@@ -5,10 +5,11 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
+import no.ntnu.item.its.osgi.common.enums.PublisherType;
 import no.ntnu.item.its.osgi.common.interfaces.SensorSchedulerService;
 
 public class SchedulerTrackerCustomizer implements 
-ServiceTrackerCustomizer<SensorSchedulerService, Object> {
+ServiceTrackerCustomizer<SensorSchedulerService, SensorSchedulerService> {
 	
 	private BundleContext context;
 	private Runnable task;
@@ -21,9 +22,9 @@ ServiceTrackerCustomizer<SensorSchedulerService, Object> {
 	}
 
 	@Override
-	public Object addingService(ServiceReference<SensorSchedulerService> arg0) {
+	public SensorSchedulerService addingService(ServiceReference<SensorSchedulerService> arg0) {
 		SensorSchedulerService scheduler = context.getService(arg0);
-		scheduler.add(task, period);
+		scheduler.add(task, period, period);
 		ServiceReference<LogService> logRef = context.getServiceReference(LogService.class);
 		if (logRef != null) {
 			context.getService(logRef).log(
@@ -32,17 +33,17 @@ ServiceTrackerCustomizer<SensorSchedulerService, Object> {
 							arg0.getBundle().getSymbolicName()));
 		}
 		
-		return null;
+		return scheduler;
 	}
 
 	@Override
-	public void modifiedService(ServiceReference<SensorSchedulerService> arg0, Object arg1) {
+	public void modifiedService(ServiceReference<SensorSchedulerService> arg0, SensorSchedulerService arg1) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void removedService(ServiceReference<SensorSchedulerService> arg0, Object arg1) {
+	public void removedService(ServiceReference<SensorSchedulerService> arg0, SensorSchedulerService arg1) {
 		ServiceReference<LogService> logRef = context.getServiceReference(LogService.class);
 		if (logRef != null) {
 			context.getService(logRef).log(

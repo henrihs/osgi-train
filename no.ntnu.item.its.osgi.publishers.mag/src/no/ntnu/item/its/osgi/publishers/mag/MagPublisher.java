@@ -24,6 +24,8 @@ public class MagPublisher implements PublisherService {
 	public static final PublisherType TYPE = PublisherType.MAG;
 	
 	public static final long SCHEDULE_PERIOD = 200;
+	private ServiceTracker<SensorSchedulerService, SensorSchedulerService> schedulerTracker;
+	private Runnable runnableSensorReading;
 
 	private Function<Void, Void> sensorReading;
 	private double[] previous;
@@ -31,7 +33,7 @@ public class MagPublisher implements PublisherService {
 
 	public MagPublisher() {		
 		sensorReading = getSensorReadingFunc();
-		Runnable runnableSensorReading = new Runnable() {
+		runnableSensorReading = new Runnable() {
 
 			@Override
 			public void run() {
@@ -39,8 +41,8 @@ public class MagPublisher implements PublisherService {
 			}
 		};
 		
-		ServiceTracker<SensorSchedulerService, Object> schedulerTracker = 
-				new ServiceTracker<SensorSchedulerService, Object>(
+		schedulerTracker = 
+				new ServiceTracker<SensorSchedulerService, SensorSchedulerService>(
 						MagPubActivator.getContext(), 
 						SensorSchedulerService.class, 
 						new SchedulerTrackerCustomizer(
@@ -55,7 +57,7 @@ public class MagPublisher implements PublisherService {
 	}
 	
 	protected void stop() {
-		sensorReading = null;
+		stopScheduledTask();
 	}
 	
 	@Override
@@ -78,7 +80,7 @@ public class MagPublisher implements PublisherService {
 				try {
 					MagControllerService mcs = (MagControllerService) 
 							MagPubActivator.magControllerTracker.getService();
-					
+					if(mcs == null) return t;
 					double[] magData = mcs.getRawData();
 					double heading = calculateHeading(magData);
 					successiveExceptions = 0;
@@ -140,6 +142,31 @@ public class MagPublisher implements PublisherService {
 				heading);
 		Event accelEvent = new Event(MagControllerService.EVENT_TOPIC, properties);
 		return accelEvent;
+	}
+
+	
+	private void stopScheduledTask(){
+		SensorSchedulerService scheduler = schedulerTracker.getService();
+		if(scheduler == null)return;
+		scheduler.remove(runnableSensorReading, false);
+	}
+	
+	private void startScheduledTask(long rate){
+		SensorSchedulerService scheduler = schedulerTracker.getService();
+		if(scheduler == null)return;
+		scheduler.add(runnableSensorReading, 0, rate);
+	}
+	
+	@Override
+	public void setPublishRate(long rate) {
+		stopScheduledTask();
+		startScheduledTask(rate);
+	}
+
+	@Override
+	public void stopPublisher() {
+		stopScheduledTask();
+		//TODO: STOP BUNDLE	
 	}
 
 }

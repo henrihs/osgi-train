@@ -83,22 +83,29 @@ public class Logger implements org.slf4j.Logger {
 	
 	@Override
 	public void trace(String s1) {
-		logger().log(LogService.LOG_DEBUG, name.concat(s1));
+//		logger().log(LogService.LOG_DEBUG, name.concat(s1));
 	}
 
 	@Override
 	public void trace(String s1, String s2) {
-		logger().log(LogService.LOG_DEBUG, String.format(name.concat(s1), s2));	
+//		logger().log(LogService.LOG_DEBUG, String.format(name.concat(s1), s2));	
 	}
 
 	@Override
 	public void trace(String s1, Throwable t) {
-		logger().log(LogService.LOG_DEBUG, name.concat(s1), t);	
+//		logger().log(LogService.LOG_DEBUG, name.concat(s1), t);	
 	}
 
 	@Override
 	public void trace(String s1, Object o) {
-		logger().log(LogService.LOG_DEBUG, String.format(name.concat(s1), o));
+//		logger().log(LogService.LOG_DEBUG, String.format(name.concat(s1), o));
 	}
+	
+	@Override
+	public void trace(String s1, Object o1, Object o2){
+//		logger().log(LogService.LOG_DEBUG, String.format(name.concat(s1), o1, o2));
+	}
+	
+
 
 }

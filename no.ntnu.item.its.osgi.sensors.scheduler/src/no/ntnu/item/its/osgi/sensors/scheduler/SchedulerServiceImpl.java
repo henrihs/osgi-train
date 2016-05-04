@@ -1,7 +1,9 @@
 package no.ntnu.item.its.osgi.sensors.scheduler;
 
+import java.util.HashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.osgi.framework.BundleActivator;
@@ -21,6 +23,7 @@ public class SchedulerServiceImpl implements BundleActivator, SensorSchedulerSer
 
 	private ScheduledExecutorService scheduler;
 	private ServiceReference<LogService> logRef;
+	private HashMap<Integer, ScheduledFuture> tasks;
 
 	/*
 	 * (non-Javadoc)
@@ -29,7 +32,7 @@ public class SchedulerServiceImpl implements BundleActivator, SensorSchedulerSer
 	public void start(BundleContext bundleContext) throws Exception {
 		SchedulerServiceImpl.context = bundleContext;
 		this.scheduler = Executors.newScheduledThreadPool(0); 
-		
+		tasks = new HashMap<>();
 		logRef = bundleContext.getServiceReference(LogService.class);
 		bundleContext.registerService(SensorSchedulerService.class, this, null);
 	}
@@ -44,17 +47,19 @@ public class SchedulerServiceImpl implements BundleActivator, SensorSchedulerSer
 	}
 
 	@Override
-	public void add(Runnable r, long period) {
-		scheduler.scheduleAtFixedRate(r, period, period, TimeUnit.MILLISECONDS);
+	public void add(Runnable r, long initialDelay, long period) {
+		ScheduledFuture<?> task = scheduler.scheduleAtFixedRate(r, initialDelay, period, TimeUnit.MILLISECONDS);
 		if (logRef != null) {
 			context.getService(logRef).log(LogService.LOG_INFO, 
 					String.format("Added runnable with hashCode %d, executing periodically each %d ms", r.hashCode(), period));
 		}
+		tasks.put(r.hashCode(), task);
 	}
 
 	@Override
-	public boolean remove(Runnable r) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean remove(Runnable r, boolean interrupt) {
+		ScheduledFuture<?> task = tasks.remove(r.hashCode());
+		if(task == null) return false;
+		return task.cancel(interrupt);
 	}
 }
