@@ -60,6 +60,11 @@ public class SchedulerServiceImpl implements BundleActivator, SensorSchedulerSer
 	public boolean remove(Runnable r, boolean interrupt) {
 		ScheduledFuture<?> task = tasks.remove(r.hashCode());
 		if(task == null) return false;
-		return task.cancel(interrupt);
+		boolean res = task.cancel(interrupt);
+		if (logRef != null) {
+			context.getService(logRef).log(LogService.LOG_INFO, 
+					String.format("Removed runnable with hashCode %d", r.hashCode()));
+		}
+		return res;
 	}
 }

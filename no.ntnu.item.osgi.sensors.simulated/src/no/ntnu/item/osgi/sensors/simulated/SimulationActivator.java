@@ -29,7 +29,7 @@ public class SimulationActivator implements BundleActivator {
 	public void start(BundleContext bundleContext) throws Exception {
 		SimulationActivator.context = bundleContext;
 		
-//		registerMifareMocker();
+		registerMifareMocker();
 		registerColorMocker();
 //		ssregisterAccelMocker();
 	}

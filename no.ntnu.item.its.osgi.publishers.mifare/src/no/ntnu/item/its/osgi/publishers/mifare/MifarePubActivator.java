@@ -11,8 +11,8 @@ import no.ntnu.item.its.osgi.common.interfaces.MifareControllerService;
 public class MifarePubActivator implements BundleActivator {
 	private static BundleContext context;
 	protected static ServiceTracker<EventAdmin, Object> eventAdminTracker;
-	protected static ServiceTracker<LogService, Object> logServiceTracker;
-	protected static ServiceTracker<MifareControllerService, Object> mifareControllerTracker;
+	protected static ServiceTracker<LogService, LogService> logServiceTracker;
+	protected static ServiceTracker<MifareControllerService, MifareControllerService> mifareControllerTracker;
 
 	private MifarePublisher publisher; 
 	

@@ -25,7 +25,7 @@ import no.ntnu.item.its.osgi.common.servicetrackers.SchedulerTrackerCustomizer;
 
 public class ColorPublisher implements PublisherService {
 	
-	public static final long  SCHEDULE_PERIOD = 15;
+	public static final long  SCHEDULE_PERIOD = 25;
 	private static final PublisherType TYPE = PublisherType.SLEEPER;
 	
 	ServiceTracker<SensorSchedulerService, SensorSchedulerService> schedulerTracker;
@@ -54,6 +54,7 @@ public class ColorPublisher implements PublisherService {
 		addRunnableToScheduler();
 		Dictionary<String, Object> serviceProps = new Hashtable<String, Object>();
 		serviceProps.put(PublisherType.class.getSimpleName(), TYPE);
+		System.out.println(String.format("%s=%s", PublisherType.class.getSimpleName(), TYPE));
 		ColorPubActivator.getContext().registerService(PublisherService.class, this, serviceProps);
 	}
 	
@@ -162,6 +163,7 @@ public class ColorPublisher implements PublisherService {
 	@Override
 	public void setPublishRate(long rate) {
 		stopScheduledTask();
+		if(rate == 0) return;
 		startScheduledTask(rate);
 	}
 
@@ -170,6 +172,11 @@ public class ColorPublisher implements PublisherService {
 		stopScheduledTask();
 		//TODO: STOP BUNDLE
 		
+	}
+
+	@Override
+	public void read() {
+		new Thread(runnableSensorReading).start();
 	}
 
 }

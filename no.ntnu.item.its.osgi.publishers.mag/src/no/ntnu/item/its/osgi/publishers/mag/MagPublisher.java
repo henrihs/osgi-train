@@ -23,7 +23,7 @@ public class MagPublisher implements PublisherService {
 
 	public static final PublisherType TYPE = PublisherType.MAG;
 	
-	public static final long SCHEDULE_PERIOD = 200;
+	public static final long SCHEDULE_PERIOD = 300;
 	private ServiceTracker<SensorSchedulerService, SensorSchedulerService> schedulerTracker;
 	private Runnable runnableSensorReading;
 
@@ -167,6 +167,11 @@ public class MagPublisher implements PublisherService {
 	public void stopPublisher() {
 		stopScheduledTask();
 		//TODO: STOP BUNDLE	
+	}
+
+	@Override
+	public void read() {
+		new Thread(runnableSensorReading).start();
 	}
 
 }

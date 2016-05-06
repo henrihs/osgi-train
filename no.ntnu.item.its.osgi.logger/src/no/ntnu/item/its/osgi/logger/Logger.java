@@ -37,6 +37,10 @@ public class Logger implements org.slf4j.Logger {
 	}
 
 	@Override
+	public void warn(String s1, Object o1, Object o2){
+		logger().log(LogService.LOG_WARNING, String.format(name.concat(s1.replace("{}", "%s")), o1, o2));
+	}
+	@Override
 	public void error(String s1) {
 		logger().log(LogService.LOG_ERROR, name.concat(s1));
 	}

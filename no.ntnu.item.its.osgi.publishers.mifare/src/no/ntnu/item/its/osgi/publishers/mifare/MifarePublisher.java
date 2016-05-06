@@ -1,5 +1,7 @@
 package no.ntnu.item.its.osgi.publishers.mifare;
 
+import java.io.FileNotFoundException;
+import java.io.UnsupportedEncodingException;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Map;
@@ -8,38 +10,27 @@ import java.util.function.Function;
 import org.osgi.framework.BundleException;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
-import org.osgi.service.event.EventConstants;
-import org.osgi.service.event.EventHandler;
 import org.osgi.service.log.LogService;
-import org.osgi.util.tracker.ServiceTracker;
 
 import no.ntnu.item.its.osgi.common.MifareKeyRing;
-import no.ntnu.item.its.osgi.common.enums.EColor;
 import no.ntnu.item.its.osgi.common.enums.MifareKeyType;
 import no.ntnu.item.its.osgi.common.enums.PublisherType;
 import no.ntnu.item.its.osgi.common.enums.Status;
 import no.ntnu.item.its.osgi.common.exceptions.NoCardFoundException;
 import no.ntnu.item.its.osgi.common.exceptions.SensorCommunicationException;
-import no.ntnu.item.its.osgi.common.interfaces.AccelerationControllerService;
-import no.ntnu.item.its.osgi.common.interfaces.ActuatorControllerService;
-import no.ntnu.item.its.osgi.common.interfaces.ColorControllerService;
-import no.ntnu.item.its.osgi.common.interfaces.MagControllerService;
 import no.ntnu.item.its.osgi.common.interfaces.MifareControllerService;
 import no.ntnu.item.its.osgi.common.interfaces.PublisherService;
-import no.ntnu.item.its.osgi.common.interfaces.SensorSchedulerService;
-import no.ntnu.item.its.osgi.common.interfaces.VelocityControllerService;
-import no.ntnu.item.its.osgi.common.servicetrackers.SchedulerTrackerCustomizer;
 
-public class MifarePublisher implements PublisherService, EventHandler {
+public class MifarePublisher implements PublisherService{
 
 //	public static final long SCHEDULE_PERIOD = 30;
 //	public static final long SLEEP_AFTER_PUBLISH_TIME = 1500;
 	private static final PublisherType TYPE = PublisherType.BEACON;
 	
 	private Function<Void, Void> sensorReading;
+	private Runnable runnableSensorReading;
 	
-	public MifarePublisher() {
-		sensorReading = getSensorReadingFunc();
+	public MifarePublisher(){
 //		Runnable runnableSensorReading = new Runnable() {
 //			@Override
 //			public void run() {
@@ -54,17 +45,32 @@ public class MifarePublisher implements PublisherService, EventHandler {
 //						new SchedulerTrackerCustomizer(
 //								MifarePubActivator.getContext(), runnableSensorReading, SCHEDULE_PERIOD));
 //		schedulerTracker.open();
+/*
 		String[] topics = new String[] { 
 				ColorControllerService.EVENT_TOPIC
 		};
 		Hashtable<String, Object> handlerProps = new Hashtable<String, Object>();
 		handlerProps.put(EventConstants.EVENT_TOPIC, topics);
 		MifarePubActivator.getContext().registerService(EventHandler.class.getName(), this, handlerProps);
-		
+		*/
+		makeRunnable();
 		Dictionary<String, Object> serviceProps = new Hashtable<String, Object>();
 		serviceProps.put(PublisherType.class.getSimpleName(), TYPE);
 		MifarePubActivator.getContext().registerService(PublisherService.class, this, serviceProps);
 		
+	}
+	
+	private void makeRunnable(){
+		sensorReading = getSensorReadingFunc();
+		runnableSensorReading = new Runnable() {
+
+			
+			@Override
+			public void run() {
+				sensorReading.apply(null);
+			}
+		};
+
 	}
 	
 	@Override
@@ -80,7 +86,6 @@ public class MifarePublisher implements PublisherService, EventHandler {
 
 	public void stop() {
 		sensorReading = null;
-		
 	}
 	
 	private Function<Void, Void> getSensorReadingFunc() {
@@ -146,28 +151,26 @@ public class MifarePublisher implements PublisherService, EventHandler {
 		}
 	}
 
-	@Override
-	public void handleEvent(Event arg0) {
-		Runnable r = new Runnable() {
-			
-			@Override
-			public void run() {
-				if (arg0.getProperty(ColorControllerService.COLOR_KEY) == EColor.BLUE) {
-					sensorReading.apply(null);
-				}				
-			}
-		};
-		new Thread(r).start();
-	}
 
 	@Override
 	public void setPublishRate(long rate) {
-		// TODO: dasd
+		
 	}
 
 	@Override
 	public void stopPublisher() {
 		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void read() {
+		getLogger().log(LogService.LOG_INFO, "Reading from MiFare sensor");
+		new Thread(runnableSensorReading).start();
+	}
+	
+	private LogService getLogger(){
+		return MifarePubActivator.logServiceTracker.getService();
 		
 	}
 

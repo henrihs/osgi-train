@@ -9,4 +9,5 @@ public interface PublisherService {
 	public PublisherType getType();
 	public void setPublishRate(long rate);
 	public void stopPublisher();
+	public void read();
 }
