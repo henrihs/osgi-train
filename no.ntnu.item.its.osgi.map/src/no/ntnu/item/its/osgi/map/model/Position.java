@@ -22,6 +22,10 @@ public class Position implements Iterable<RailComponent> {
 	public void updateDirection(PointConnector direction) {
 		this.direction = direction;
 	}
+	
+	public PointConnector getDirection() {
+		return direction;
+	}
 		
 	public RailComponent head(){
 		return partsCovered.get(0);
