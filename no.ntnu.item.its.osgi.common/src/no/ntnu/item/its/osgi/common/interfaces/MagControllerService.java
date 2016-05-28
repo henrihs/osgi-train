@@ -11,5 +11,5 @@ public interface MagControllerService {
 	public static final String HEADING_KEY = "mag.heading";
 	public static final String TIMESTAMP_KEY = "data.timestamp";
 
-	public double[] getRawData() throws SensorCommunicationException;
+	public int[] getRawData() throws SensorCommunicationException;
 }

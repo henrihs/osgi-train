@@ -1,8 +1,8 @@
 package test;
 
-import org.apache.commons.math.analysis.integration.TrapezoidIntegrator;
+import java.io.UnsupportedEncodingException;
 
-import no.ntnu.item.its.osgi.publishers.speed.VelocityData;
+import javax.naming.SizeLimitExceededException;
 
 //import no.ntnu.item.its.osgi.publishers.speed.SpeedPubActivator;
 //import no.ntnu.item.its.osgi.publishers.speed.SpeedPublisher.AccelExpression;
@@ -11,13 +11,71 @@ import no.ntnu.item.its.osgi.publishers.speed.VelocityData;
 public class Main {
 	
 	public static void main(String[] args) {
-		TrapezoidIntegrator t = new TrapezoidIntegrator();
-		VelocityData<TrapezoidIntegrator> v0 = new VelocityData<TrapezoidIntegrator>(-0.011112890624999996, 9317271594525L, t);
-		VelocityData<TrapezoidIntegrator> v1 = new VelocityData<TrapezoidIntegrator>(0.007664062500000001, 9317446991589L, t);
+//		TrapezoidIntegrator t = new TrapezoidIntegrator();
+//		VelocityData<TrapezoidIntegrator> v0 = new VelocityData<TrapezoidIntegrator>(-0.011112890624999996, 9317271594525L, t);
+//		VelocityData<TrapezoidIntegrator> v1 = new VelocityData<TrapezoidIntegrator>(0.007664062500000001, 9317446991589L, t);
+//		
+//		v1.calculateVelocityDelta(v0);
+//		System.out.println(v0);
+//		System.out.println(v1);
+		try {
+			System.out.println(("1".getBytes("utf-8")).length);
+			System.out.println(("2".getBytes("utf-8")).length);
+			System.out.println(("3".getBytes("utf-8")).length);
+			System.out.println(("4".getBytes("utf-8")).length);
+			System.out.println(("5".getBytes("utf-8")).length);
+			System.out.println(("6".getBytes("utf-8")).length);
+			System.out.println(("7".getBytes("utf-8")).length);
+			System.out.println(("8".getBytes("utf-8")).length);
+			System.out.println(("9".getBytes("utf-8")).length);
+			System.out.println(("0".getBytes("utf-8")).length);
+			System.out.println(("a".getBytes("utf-8")).length);
+			System.out.println(("b".getBytes("utf-8")).length);
+			System.out.println(("c".getBytes("utf-8")).length);
+			System.out.println(("d".getBytes("utf-8")).length);
+			System.out.println(("e".getBytes("utf-8")).length);
+			System.out.println(("f".getBytes("utf-8")).length);
+			System.out.println(("g".getBytes("utf-8")).length);
+			System.out.println(("h".getBytes("utf-8")).length);
+			System.out.println(("i".getBytes("utf-8")).length);
+			System.out.println(("j".getBytes("utf-8")).length);
+			System.out.println(("k".getBytes("utf-8")).length);
+			System.out.println(("l".getBytes("utf-8")).length);
+			System.out.println(("m".getBytes("utf-8")).length);
+			System.out.println(("n".getBytes("utf-8")).length);
+			System.out.println(("o".getBytes("utf-8")).length);
+			System.out.println(("p".getBytes("utf-8")).length);
+			System.out.println(("q".getBytes("utf-8")).length);
+			System.out.println(("r".getBytes("utf-8")).length);
+			System.out.println(("s".getBytes("utf-8")).length);
+			System.out.println(("t".getBytes("utf-8")).length);
+			System.out.println(("u".getBytes("utf-8")).length);
+			System.out.println(("v".getBytes("utf-8")).length);
+			System.out.println(("x".getBytes("utf-8")).length);
+			System.out.println(("y".getBytes("utf-8")).length);
+			System.out.println(("z".getBytes("utf-8")).length);
+			System.out.println(("æ".getBytes("utf-8")).length);
+			System.out.println(("ø".getBytes("utf-8")).length);
+			System.out.println(("å".getBytes("utf-8")).length);
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+	
+	static byte[] pad(byte[] oldBytes) throws SizeLimitExceededException {
+		if (oldBytes.length > 16) {
+			throw new SizeLimitExceededException("Too large data set");
+		}
 		
-		v1.calculateVelocityDelta(v0);
-		System.out.println(v0);
-		System.out.println(v1);
+		byte[] newBytes = new byte[16];
+		int diff = newBytes.length-oldBytes.length;
+		for (int i = 0; i < newBytes.length; i++) {
+			newBytes[i] = i >= diff ? oldBytes[i-diff] : 0x00;
+		}
+		
+		return newBytes;
 	}
 	
 	/*

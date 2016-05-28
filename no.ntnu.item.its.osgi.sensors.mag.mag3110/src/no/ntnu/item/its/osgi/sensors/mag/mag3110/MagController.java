@@ -34,7 +34,7 @@ public class MagController implements MagControllerService {
 	}
 
 	@Override
-	public double[] getRawData() throws SensorCommunicationException {
+	public int[] getRawData() throws SensorCommunicationException {
 		int r;
 		r=0;
 		int regsM = 7; 						
@@ -55,15 +55,15 @@ public class MagController implements MagControllerService {
 		short magnet = 0;
 
 		magnet = (short) ((readM[1] << 8) | (readM[2]&0xff)); //16-bit signed x value
-		double xM = magnet/10.0;
+		int xM = magnet;
 
 		magnet = (short) ((readM[3] << 8) | (readM[4]&0xff)); //16-bit signed y value     
-		double yM = magnet/10.0;
+		int yM = magnet;
 
 		magnet = (short) ((readM[5] << 8) | (readM[6]&0xff)); //16-bit signed z value     
-		double zM = magnet/10.0;
+		int zM = magnet;
 
-		return new double[] {xM, yM, zM};
+		return new int[] {xM, yM, zM};
 	}
 
 }

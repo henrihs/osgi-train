@@ -79,10 +79,11 @@ public class MagPublisher implements PublisherService {
 					MagControllerService mcs = (MagControllerService) 
 							MagPubActivator.magControllerTracker.getService();
 					
-					double[] magData = mcs.getRawData();
-					double heading = calculateHeading(magData);
+					int[] magData = mcs.getRawData();
+					double[] siMagData = convertToSIUnits(magData);
+					double heading = calculateHeading(siMagData);
 					successiveExceptions = 0;
-					publish(magData, heading);
+					publish(siMagData, heading);
 				} catch (Exception e) {
 					if (e.getClass().equals(SensorCommunicationException.class) && successiveExceptions++ < 4) {
 						return t;
@@ -100,11 +101,33 @@ public class MagPublisher implements PublisherService {
 				}
 				return t;
 			}
+
+		};
+	}
+	
+	private double[] convertToSIUnits(int[] magData) {
+		return new double[] {
+			magData[0] / 10.0,
+			magData[1] / 10.0,
+			magData[2] / 10.0
 		};
 	}
 	
 	private double calculateHeading(double[] magDataXyz) {
-		return 180*Math.atan2(magDataXyz[1],magDataXyz[0])/Math.PI;
+		double x = magDataXyz[0];
+		double y = magDataXyz[1];
+		
+		if (y > 0) {
+			return 90 - Math.atan(x/y)*180/Math.PI;
+		} else if (y < 0) {
+			return 270 - Math.atan(x/y)*180/Math.PI;
+		} else if (x > 0) {
+			return 0;
+		} else if (x < 0) {
+			return 180;
+		}
+		
+		return 0;
 	}
 	
 	private void publish(double[] magData, double heading) {
