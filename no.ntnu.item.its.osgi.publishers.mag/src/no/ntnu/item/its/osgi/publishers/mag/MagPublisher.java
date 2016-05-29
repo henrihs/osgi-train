@@ -24,6 +24,8 @@ public class MagPublisher implements PublisherService {
 	public static final PublisherType TYPE = PublisherType.MAG;
 	
 	public static final long SCHEDULE_PERIOD = 200;
+	public static final double CALIBRATION_X_AXIS = 65;
+	public static final double CALIBRATION_Y_AXIS = -85;
 
 	private Function<Void, Void> sensorReading;
 
@@ -80,6 +82,7 @@ public class MagPublisher implements PublisherService {
 					
 					int[] magData = mcs.getRawData();
 					double[] siMagData = convertToSIUnits(magData);
+					siMagData = applyCalibration(siMagData);
 					double heading = calculateHeading(siMagData);
 					successiveExceptions = 0;
 					publish(siMagData, heading);
@@ -112,15 +115,22 @@ public class MagPublisher implements PublisherService {
 		};
 	}
 	
+	private double[] applyCalibration(double[] magDataXyz) {
+		magDataXyz[0] = magDataXyz[0] + CALIBRATION_X_AXIS;
+		magDataXyz[1] = magDataXyz[1] + CALIBRATION_Y_AXIS;
+		
+		return magDataXyz;
+	}
+	
 	private double calculateHeading(double[] magDataXyz) {
 		double x = magDataXyz[0];
 		double y = magDataXyz[1];
 		double h = 0;
 		
 		if (y > 0) {
-			h = 90 - Math.atan2(y, x)*180/Math.PI;
+			h = 90 - Math.atan(x/y)*180/Math.PI;
 		} else if (y < 0) {
-			h = 270 - Math.atan2(y, x)*180/Math.PI;
+			h = 270 - Math.atan(x/y)*180/Math.PI;
 		} else if (x > 0) {
 			h = 0;
 		} else if (x < 0) {
@@ -128,6 +138,8 @@ public class MagPublisher implements PublisherService {
 		}
 		
 		return h;
+		
+//		return Math.atan(x/y);
 	}
 	
 	private void publish(double[] magData, double heading) {

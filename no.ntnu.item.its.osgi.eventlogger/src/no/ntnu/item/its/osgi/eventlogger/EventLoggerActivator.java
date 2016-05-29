@@ -115,6 +115,8 @@ public class EventLoggerActivator implements BundleActivator, EventHandler {
 					headingWriter.println(
 							(long)arg0.getProperty(MagControllerService.TIMESTAMP_KEY)*1E-9 + ", " + 
 							arg0.getProperty(MagControllerService.HEADING_KEY));
+//					headingWriter.println(arg0.getProperty(MagControllerService.X_DATA_KEY) + ", " +
+//											arg0.getProperty(MagControllerService.Y_DATA_KEY));
 				}
 				
 			}
