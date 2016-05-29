@@ -23,23 +23,21 @@ public class ColorClassifier {
 		colors.add(new ColorMapping(EColor.YELLOW));
 	}
 	
-	protected static EColor colorApproximation(int[] rawColor) {
-		double minEntry = 10000;
+	static EColor colorApproximation(int[] rawColor) {
+		double minDiff = 10000;
 		EColor minColor = null;
 		
 		for (ColorMapping mapping : colors) {
 			double diff = mapping.compareWith(rawColor);
-//			System.out.print(diff + ", ");
-			if (diff < minEntry) {
-//				if (diff < 10) {
-//					return mapping.getType();
-//				}
-				minEntry = diff;
+
+			if (diff < minDiff) {
+
+				minDiff = diff;
 				minColor = mapping.getType();
 			}
 		}
 
-		if (minEntry > 20) { // Don't make too approximated approximations!
+		if (minDiff > 20) { // Don't make too approximated approximations!
 			return EColor.UNKNOWN;
 		}
 

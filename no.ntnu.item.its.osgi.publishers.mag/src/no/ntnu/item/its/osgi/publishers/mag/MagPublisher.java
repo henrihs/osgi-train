@@ -26,7 +26,6 @@ public class MagPublisher implements PublisherService {
 	public static final long SCHEDULE_PERIOD = 200;
 
 	private Function<Void, Void> sensorReading;
-	private double[] previous;
 
 
 	public MagPublisher() {		
@@ -116,25 +115,25 @@ public class MagPublisher implements PublisherService {
 	private double calculateHeading(double[] magDataXyz) {
 		double x = magDataXyz[0];
 		double y = magDataXyz[1];
+		double h = 0;
 		
 		if (y > 0) {
-			return 90 - Math.atan(x/y)*180/Math.PI;
+			h = 90 - Math.atan2(y, x)*180/Math.PI;
 		} else if (y < 0) {
-			return 270 - Math.atan(x/y)*180/Math.PI;
+			h = 270 - Math.atan2(y, x)*180/Math.PI;
 		} else if (x > 0) {
-			return 0;
+			h = 0;
 		} else if (x < 0) {
-			return 180;
+			h = 180;
 		}
 		
-		return 0;
+		return h;
 	}
 	
 	private void publish(double[] magData, double heading) {
 		if (!MagPubActivator.eventAdminTracker.isEmpty()) {
 			Event magEvent = createEvent(magData, heading);			
 			((EventAdmin) MagPubActivator.eventAdminTracker.getService()).postEvent(magEvent);
-			previous = magData;
 		}
 		
 		else if (!MagPubActivator.logServiceTracker.isEmpty()) {
