@@ -38,7 +38,7 @@ public class PwmActivator implements BundleActivator {
 		try {
 			controller = new ActuatorControllerImpl();
 			bundleContext.registerService(ActuatorControllerService.class, controller, null);
-			controller.send(MotorCommand.FORWARD, 110);			
+			controller.send(MotorCommand.FORWARD);			
 		} catch (SensorInitializationException e) {
 			if (!logServiceTracker.isEmpty()) {
 				((LogService)logServiceTracker.getService()).log(

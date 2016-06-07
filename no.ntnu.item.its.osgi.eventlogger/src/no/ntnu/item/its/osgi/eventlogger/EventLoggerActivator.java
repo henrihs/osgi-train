@@ -39,6 +39,7 @@ public class EventLoggerActivator implements BundleActivator, EventHandler {
 	private PrintWriter velocityWriter;
 	private PrintWriter commandWriter;
 	private PrintWriter headingWriter;
+	private PrintWriter colorWriter;
 
 	/*
 	 * (non-Javadoc)
@@ -64,6 +65,7 @@ public class EventLoggerActivator implements BundleActivator, EventHandler {
 		velocityWriter = new PrintWriter("velocity_" + now + ".csv", "UTF-8");
 		commandWriter = new PrintWriter("command_" + now + ".csv", "UTF-8");
 		headingWriter = new PrintWriter("mag_" + now + ".csv", "UTF-8");
+		colorWriter = new PrintWriter("mifare_" + now + ".csv", "UTF-8");
 	}
 
 	/*
@@ -75,6 +77,7 @@ public class EventLoggerActivator implements BundleActivator, EventHandler {
 		velocityWriter.close();
 		commandWriter.close();
 		headingWriter.close();
+		colorWriter.close();
 		EventLoggerActivator.context = null;
 	}
 	
@@ -87,10 +90,12 @@ public class EventLoggerActivator implements BundleActivator, EventHandler {
 			@Override
 			public void run() {
 				if (arg0.getTopic().equals(ColorControllerService.EVENT_TOPIC)) {
-					System.out.println(ColorControllerService.COLOR_KEY + ": " + arg0.getProperty(ColorControllerService.COLOR_KEY));
+//					System.out.println(ColorControllerService.COLOR_KEY + ": " + arg0.getProperty(ColorControllerService.COLOR_KEY));
+					colorWriter.println(arg0.getProperty(ColorControllerService.COLOR_KEY));
 				} 
 				else if (arg0.getTopic().equals(MifareControllerService.EVENT_TOPIC)) {
-					System.out.println(MifareControllerService.LOC_ID_KEY + ": " + arg0.getProperty(MifareControllerService.LOC_ID_KEY));
+//					System.out.println(MifareControllerService.LOC_ID_KEY + ": " + arg0.getProperty(MifareControllerService.LOC_ID_KEY));
+					colorWriter.println(System.nanoTime()*1E-9 + ", " + arg0.getProperty(MifareControllerService.LOC_ID_KEY));
 				}
 				else if (arg0.getTopic().equals(AccelerationControllerService.EVENT_TOPIC)) {
 					accelWriter.println(

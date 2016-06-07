@@ -46,16 +46,16 @@ public class ActuatorControllerImpl implements ActuatorControllerService {
 					synchronized (motor) {						
 						publish(command);
 						if (command == MotorCommand.STOP) {
-							for (int i = 149; i >= 0; i--) {
-								motor.setSpeed(i);
-								Thread.sleep(SPEED_STEP_SLEEP_TIME);
-							}
+//							for (int i = 149; i >= 0; i--) {
+								motor.setSpeed(0);
+//								Thread.sleep(SPEED_STEP_SLEEP_TIME);
+//							}
 						} else {
 							motor.setDirection(command);
-							for (int i = 0; i < 150; i++) {
-								motor.setSpeed(i);
-								Thread.sleep(SPEED_STEP_SLEEP_TIME);
-							}
+//							for (int i = 0; i < 150; i++) {
+								motor.setSpeed(110);
+//								Thread.sleep(SPEED_STEP_SLEEP_TIME);
+//							}
 						}
 					}
 
@@ -66,9 +66,9 @@ public class ActuatorControllerImpl implements ActuatorControllerService {
 								"Could not issue command to motors!",
 								e);
 					}
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+//				} catch (InterruptedException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
 				}				
 			}
 		};

@@ -25,8 +25,9 @@ import no.ntnu.item.its.osgi.common.servicetrackers.SchedulerTrackerCustomizer;
 
 public class ColorPublisher implements PublisherService {
 	
-	public static final long SCHEDULE_PERIOD = 15;
+	public static final long SCHEDULE_PERIOD = 16;
 	private static final PublisherType TYPE = PublisherType.SLEEPER;
+	public PrintWriter writer;
 	
 	private EColor lastRegisteredColor;
 
@@ -47,7 +48,7 @@ public class ColorPublisher implements PublisherService {
 	
 
 	public ColorPublisher() throws FileNotFoundException, UnsupportedEncodingException {
-		colorWriter = new PrintWriter("color_" + System.currentTimeMillis() + ".csv", "UTF-8");
+		writer = new PrintWriter("colortiming_" + System.currentTimeMillis() + ".csv", "UTF-8");
 		sensorReading = getSensorReadingFunc();
 		Runnable runnableSensorReading = new Runnable() {
 
@@ -101,7 +102,8 @@ public class ColorPublisher implements PublisherService {
 
 	private Function<Void, Void> getSensorReadingFunc() throws FileNotFoundException, UnsupportedEncodingException {
 		return new Function<Void, Void>() {
-			
+
+			double last = 0;
 //			long last = 0;
 			
 			@Override
@@ -109,6 +111,9 @@ public class ColorPublisher implements PublisherService {
 				try {
 					ColorControllerService ccs = (ColorControllerService) ColorPubActivator.colorControllerTracker.getService();
 					int[] rawColor = ccs.getRawData();
+					double time = System.nanoTime()*1E-6;
+					writer.println(time-last);
+					last = time;
 //					long now = System.nanoTime();
 //					if (last != 0) {colorWriter.println(String.format("%f",(now-last)*1E-9));}
 //					last = now;
@@ -135,7 +140,7 @@ public class ColorPublisher implements PublisherService {
 	}
 
 	public void stop() {
-		colorWriter.close();
+		writer.close();
 		sensorReading = null;
 	}
 

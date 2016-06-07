@@ -30,9 +30,9 @@ import no.ntnu.item.its.osgi.common.interfaces.SensorSchedulerService;
 import no.ntnu.item.its.osgi.common.interfaces.VelocityControllerService;
 import no.ntnu.item.its.osgi.common.servicetrackers.SchedulerTrackerCustomizer;
 
-public class MifarePublisher implements PublisherService, EventHandler {
+public class MifarePublisher implements PublisherService {
 
-//	public static final long SCHEDULE_PERIOD = 30;
+	public static final long SCHEDULE_PERIOD = 32;
 //	public static final long SLEEP_AFTER_PUBLISH_TIME = 1500;
 	private static final PublisherType TYPE = PublisherType.BEACON;
 	
@@ -40,20 +40,20 @@ public class MifarePublisher implements PublisherService, EventHandler {
 	
 	public MifarePublisher() {
 		sensorReading = getSensorReadingFunc();
-//		Runnable runnableSensorReading = new Runnable() {
-//			@Override
-//			public void run() {
-//				sensorReading.apply(null);
-//			}
-//		};
+		Runnable runnableSensorReading = new Runnable() {
+			@Override
+			public void run() {
+				sensorReading.apply(null);
+			}
+		};
 
-//		ServiceTracker<SensorSchedulerService, Object> schedulerTracker = 
-//				new ServiceTracker<SensorSchedulerService, Object>(
-//						MifarePubActivator.getContext(), 
-//						SensorSchedulerService.class, 
-//						new SchedulerTrackerCustomizer(
-//								MifarePubActivator.getContext(), runnableSensorReading, SCHEDULE_PERIOD));
-//		schedulerTracker.open();
+		ServiceTracker<SensorSchedulerService, Object> schedulerTracker = 
+				new ServiceTracker<SensorSchedulerService, Object>(
+						MifarePubActivator.getContext(), 
+						SensorSchedulerService.class, 
+						new SchedulerTrackerCustomizer(
+								MifarePubActivator.getContext(), runnableSensorReading, SCHEDULE_PERIOD));
+		schedulerTracker.open();
 		String[] topics = new String[] { 
 				ColorControllerService.EVENT_TOPIC
 		};
@@ -145,19 +145,19 @@ public class MifarePublisher implements PublisherService, EventHandler {
 					LogService.LOG_INFO, "Failed to publish event, no EventAdmin service available!");
 		}
 	}
-
-	@Override
-	public void handleEvent(Event arg0) {
-		Runnable r = new Runnable() {
-			
-			@Override
-			public void run() {
-				if (arg0.getProperty(ColorControllerService.COLOR_KEY) == EColor.BLUE) {
-					sensorReading.apply(null);
-				}				
-			}
-		};
-		new Thread(r).start();
-	}
+//
+//	@Override
+//	public void handleEvent(Event arg0) {
+//		Runnable r = new Runnable() {
+//			
+//			@Override
+//			public void run() {
+//				if (arg0.getProperty(ColorControllerService.COLOR_KEY) == EColor.BLUE) {
+//					sensorReading.apply(null);
+//				}				
+//			}
+//		};
+//		new Thread(r).start();
+//	}
 
 }
